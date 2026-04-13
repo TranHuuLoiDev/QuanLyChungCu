@@ -1,1 +1,1 @@
-# QuanLyChungCu
+Ứng dụng Quản Lý Chung Cư
