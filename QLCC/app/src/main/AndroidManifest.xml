@@ -11,8 +11,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.QLCC">
 
-        <activity android:name=".MainActivity" />
-
         <activity android:name=".HomeUserActivity" />
         <activity android:name=".AdminDashboardActivity" />
         <activity android:name=".ReportActivity" />
