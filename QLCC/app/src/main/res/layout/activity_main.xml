@@ -1,19 +1,95 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:padding="20dp">
 
+    <!-- TIÊU ĐỀ -->
     <TextView
+        android:id="@+id/title"
+        android:text="Apartment Building Parking Lot"
+        android:textSize="20sp"
+        android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:background="@drawable/parking_border"
+        android:padding="10dp"
+        android:layout_centerHorizontal="true"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- BUTTON THÊM XE -->
+    <Button
+        android:id="@+id/btnAddVehicle"
+        android:text="Thêm xe"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title"
+        android:layout_marginTop="15dp"/>
+
+    <!-- BUTTON HIỂN THỊ LIST -->
+    <Button
+        android:id="@+id/btnShowList"
+        android:text="Hiển thị danh sách xe"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnAddVehicle"
+        android:layout_marginTop="10dp"/>
+
+    <!-- KHU VỰC LIST -->
+    <LinearLayout
+        android:id="@+id/layoutListContainer"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/btnShowList"
+        android:layout_marginTop="10dp"
+        android:visibility="gone">
+
+        <!-- Ô TÌM KIẾM -->
+        <EditText
+            android:id="@+id/edtSearch"
+            android:hint="Nhập biển số hoặc tên..."
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:background="@android:drawable/edit_text"/>
+
+        <!-- LIST VIEW -->
+        <ListView
+            android:id="@+id/listVehicle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"/>
+
+    </LinearLayout>
+
+    <!-- BOX TRẠNG THÁI -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="10dp"
+        android:background="@android:drawable/dialog_holo_light_frame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true">
+
+        <TextView
+            android:id="@+id/tvAvailable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Còn: 0/100"
+            android:textColor="#4CAF50"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvStatus"
+            android:text="Available"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="#4CAF50"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
