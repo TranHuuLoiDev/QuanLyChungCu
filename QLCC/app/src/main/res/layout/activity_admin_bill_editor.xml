@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F8F9FA">
+
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarAdmin"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#FF9800"
+        app:title="Trang Quản lý hóa đơn"
+        app:titleTextColor="#FFFFFF"
+        app:menu="@menu/menu_admin_apartment"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:text="Chỉnh sửa / Tạo hóa đơn"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <!-- Căn hộ -->
+            <TextView
+                android:text="Căn hộ"
+                android:textSize="16sp"
+                android:layout_marginBottom="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Spinner
+                android:id="@+id/spinnerApartment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Ngày nhận phòng -->
+            <TextView
+                android:text="Ngày nhận phòng"
+                android:textSize="16sp"
+                android:layout_marginBottom="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/btnCheckInDate"
+                android:text="Chọn ngày nhận phòng"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Ngày trả phòng -->
+            <TextView
+                android:text="Ngày trả phòng"
+                android:textSize="16sp"
+                android:layout_marginBottom="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/btnCheckOutDate"
+                android:text="Chọn ngày trả phòng"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Tiền điện -->
+            <EditText
+                android:id="@+id/edtElectric"
+                android:hint="Tiền điện (VNĐ)"
+                android:inputType="numberDecimal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Tiền nước -->
+            <EditText
+                android:id="@+id/edtWater"
+                android:hint="Tiền nước (VNĐ)"
+                android:inputType="numberDecimal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Tiền gửi xe -->
+            <EditText
+                android:id="@+id/edtRent"
+                android:hint="Tiền gửi xe (VNĐ)"
+                android:inputType="numberDecimal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Số tháng thuê -->
+            <EditText
+                android:id="@+id/edtMonths"
+                android:hint="Số tháng thuê"
+                android:inputType="number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Tiền thuê (tự tính) -->
+            <TextView
+                android:id="@+id/tvTotalRent"
+                android:text="Tiền thuê căn hộ: 0 VNĐ"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#D32F2F"
+                android:layout_marginTop="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <!-- Nút Lưu -->
+            <Button
+                android:id="@+id/btnSave"
+                android:text="Lưu hóa đơn"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:backgroundTint="#2196F3" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
