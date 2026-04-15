@@ -37,21 +37,35 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Gọi hàm kiểm tra tài khoản từ Database
-            val loggedInUser = dbHelper.checkLogin(username, password)
+            // Bước 1: Thử tìm trong phòng Admin trước
+            val loggedInAdmin = dbHelper.checkAdminLogin(username, password)
 
-            if (loggedInUser != null) {
-                Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show()
+            if (loggedInAdmin != null) {
+                // Nếu tìm thấy -> Đích thị là Ban Quản Lý
+                Toast.makeText(this, "Xin chào Ban Quản Lý!", Toast.LENGTH_SHORT).show()
 
-                // Chuyển sang màn hình Home và gửi kèm thông tin người dùng
-                val intent = Intent(this, HomeUserActivity::class.java)
-                intent.putExtra("USER_INFO", loggedInUser)
+                val intent = Intent(this, AdminDashboardActivity::class.java)
+                intent.putExtra("ADMIN_INFO", loggedInAdmin) // Chú ý: Nhãn dán gói hàng là ADMIN_INFO
                 startActivity(intent)
-
-                // Đóng màn hình đăng nhập
                 finish()
+
             } else {
-                Toast.makeText(this, "Sai tài khoản hoặc mật khẩu!", Toast.LENGTH_SHORT).show()
+                // Bước 2: Không thấy bên Admin, chạy qua phòng Cư dân tìm
+                val loggedInUser = dbHelper.checkLogin(username, password)
+
+                if (loggedInUser != null) {
+                    // Nếu tìm thấy -> Là Cư dân bình thường
+                    Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show()
+
+                    val intent = Intent(this, HomeUserActivity::class.java)
+                    intent.putExtra("USER_INFO", loggedInUser) // Nhãn dán gói hàng là USER_INFO
+                    startActivity(intent)
+                    finish()
+
+                } else {
+                    // Bước 3: Tìm cả 2 phòng đều không có mặt
+                    Toast.makeText(this, "Sai tài khoản hoặc mật khẩu!", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

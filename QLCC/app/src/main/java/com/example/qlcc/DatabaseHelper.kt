@@ -19,10 +19,8 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
 
     private fun copyDatabase() {
         try {
-            // Mở file từ thư mục assets
             val inputStream = context.assets.open("QuanLyCC.db")
             val outputFile = File(dbPath)
-
 
             if (outputFile.parentFile?.exists() == false) {
                 outputFile.parentFile?.mkdirs()
@@ -38,16 +36,16 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
     override fun onCreate(db: SQLiteDatabase?) {}
     override fun onUpgrade(db: SQLiteDatabase?, old: Int, new: Int) {}
 
-    // Hàm kiểm tra Đăng nhập
+    // ==========================================
+    // 1. Hàm kiểm tra Đăng nhập cho CƯ DÂN
+    // ==========================================
     fun checkLogin(username: String, pass: String): User? {
         val db = this.readableDatabase
         var user: User? = null
 
-        // Truy vấn tìm tài khoản trong bảng Users
         val cursor = db.rawQuery("SELECT * FROM Users WHERE user_name = ? AND user_password = ?", arrayOf(username, pass))
 
         if (cursor.moveToFirst()) {
-            // Nếu tìm thấy, đóng gói thông tin vào Model User
             user = User(
                 userId = cursor.getInt(cursor.getColumnIndexOrThrow("user_id")),
                 userName = cursor.getString(cursor.getColumnIndexOrThrow("user_name")),
@@ -57,7 +55,29 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
             )
         }
         cursor.close()
-        db.close()
+        // Lưu ý: Không nên để db.close() ở đây để tránh lỗi sập app khi màn hình khác muốn gọi Database
         return user
+    }
+
+    // ==========================================
+    // 2. Hàm kiểm tra Đăng nhập cho ADMIN (Đứng ngang hàng)
+    // ==========================================
+    fun checkAdminLogin(username: String, pass: String): Admin? {
+        val db = this.readableDatabase
+        var admin: Admin? = null
+
+        val cursor = db.rawQuery("SELECT * FROM Admin WHERE admin_username = ? AND admin_password = ?", arrayOf(username, pass))
+
+        if (cursor.moveToFirst()) {
+            admin = Admin(
+                adminId = cursor.getInt(cursor.getColumnIndexOrThrow("admin_id")),
+                adminUsername = cursor.getString(cursor.getColumnIndexOrThrow("admin_username")),
+                adminFullname = cursor.getString(cursor.getColumnIndexOrThrow("admin_fullname")),
+                adminPhonenumber = cursor.getString(cursor.getColumnIndexOrThrow("admin_phonenumber")),
+                adminRole = cursor.getString(cursor.getColumnIndexOrThrow("admin_role"))
+            )
+        }
+        cursor.close()
+        return admin
     }
 }

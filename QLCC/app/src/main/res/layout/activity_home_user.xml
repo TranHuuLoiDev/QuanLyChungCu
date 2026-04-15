@@ -6,14 +6,6 @@
     android:orientation="vertical"
     android:background="#F8F9FA">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="#2196F3"
-        app:title="Trang chủ Cư dân"
-        app:titleTextColor="#FFFFFF" />
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -228,6 +220,19 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <Button
+                android:id="@+id/btnLogout"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="20dp"
+                android:backgroundTint="#D32F2F"
+                android:text="ĐĂNG XUẤT"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                app:cornerRadius="12dp"
+                app:icon="@android:drawable/ic_lock_power_off"
+                app:iconGravity="textStart" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
