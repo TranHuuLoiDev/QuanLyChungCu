@@ -80,4 +80,25 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         cursor.close()
         return admin
     }
+    fun getReportsByUserId(userId: Int): List<Report> {
+        val reportList = mutableListOf<Report>()
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM Reports WHERE user_id = ? ORDER BY report_id DESC", arrayOf(userId.toString()))
+
+        if (cursor.moveToFirst()) {
+            do {
+                val report = Report(
+                    reportId = cursor.getInt(cursor.getColumnIndexOrThrow("report_id")),
+                    userId = cursor.getInt(cursor.getColumnIndexOrThrow("user_id")),
+                    title = cursor.getString(cursor.getColumnIndexOrThrow("title")),
+                    content = cursor.getString(cursor.getColumnIndexOrThrow("content")),
+                    createdDate = cursor.getString(cursor.getColumnIndexOrThrow("created_date")),
+                    status = cursor.getString(cursor.getColumnIndexOrThrow("status"))
+                )
+                reportList.add(report)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return reportList
+    }
 }

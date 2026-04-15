@@ -27,7 +27,9 @@ class HomeUserActivity : AppCompatActivity() {
             tvRoomNumber.text = "Phòng ${currentUser.roomID}"
         }
 
-        // 3. Xử lý sự kiện Đăng xuất
+        // ==========================================
+        // 3. XỬ LÝ SỰ KIỆN NÚT ĐĂNG XUẤT
+        // ==========================================
         btnLogout.setOnClickListener {
             val builder = AlertDialog.Builder(this)
             builder.setTitle("Đăng xuất")
@@ -43,6 +45,22 @@ class HomeUserActivity : AppCompatActivity() {
 
             builder.setNegativeButton("Hủy", null)
             builder.show()
+        }
+
+        // ==========================================
+        // 4. XỬ LÝ SỰ KIỆN NÚT PHẢN ÁNH
+        // ==========================================
+
+        // Tìm cái CardView Phản ánh bằng ID (Chỉ khai báo 1 lần duy nhất)
+        val btnReports = findViewById<androidx.cardview.widget.CardView>(R.id.btnReports)
+
+        btnReports.setOnClickListener {
+            // Chuyển sang màn hình Lịch sử (ReportHistoryActivity)
+            val intent = Intent(this, ReportHistoryActivity::class.java)
+
+            // CỰC KỲ QUAN TRỌNG: Gửi kèm thông tin User sang trang Lịch sử
+            intent.putExtra("USER_INFO", currentUser)
+            startActivity(intent)
         }
     }
 }
