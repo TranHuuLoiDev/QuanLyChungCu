@@ -55,7 +55,6 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
             )
         }
         cursor.close()
-        // Lưu ý: Không nên để db.close() ở đây để tránh lỗi sập app khi màn hình khác muốn gọi Database
         return user
     }
 
@@ -80,6 +79,10 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         cursor.close()
         return admin
     }
+
+    // ==========================================
+    // 3. Hàm lấy danh sách phản ánh của một Cư dân
+    // ==========================================
     fun getReportsByUserId(userId: Int): List<Report> {
         val reportList = mutableListOf<Report>()
         val db = this.readableDatabase
@@ -100,5 +103,24 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         }
         cursor.close()
         return reportList
+    }
+
+    // ==========================================
+    // 4. HÀM MỚI: Thêm phản ánh vào Database
+    // ==========================================
+    fun insertReport(userId: Int, title: String, content: String, date: String): Boolean {
+        val db = this.writableDatabase
+        val values = android.content.ContentValues()
+
+        values.put("user_id", userId)
+        values.put("title", title)
+        values.put("content", content)
+        values.put("created_date", date)
+        values.put("status", "Chờ xử lý")
+
+        // insert trả về -1 nếu bị lỗi
+        val result = db.insert("Reports", null, values)
+        db.close()
+        return result != -1L
     }
 }
