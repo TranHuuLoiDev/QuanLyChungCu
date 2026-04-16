@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.qlcc
 
 import android.Manifest
 import android.content.Intent
