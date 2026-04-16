@@ -62,5 +62,13 @@ class HomeUserActivity : AppCompatActivity() {
             intent.putExtra("USER_INFO", currentUser)
             startActivity(intent)
         }
+
+        // 5. XỬ LÝ SỰ KIỆN NÚT "XEM TẤT CẢ" THÔNG BÁO
+        val tvViewAllNoti = findViewById<TextView>(R.id.tvViewAllNoti)
+        tvViewAllNoti.setOnClickListener {
+            // Sẽ tạo NotificationActivity ở Bước 4
+            val intent = Intent(this, NotificationActivity::class.java)
+            startActivity(intent)
+        }
     }
 }

@@ -123,4 +123,27 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         db.close()
         return result != -1L
     }
+
+    // Lấy tất cả thông báo
+    fun getAllNotifications(): List<NotificationModel> {
+        val list = mutableListOf<NotificationModel>()
+        val db = this.readableDatabase
+        // Giả sử bảng của bạn tên là Notifications (nếu tên khác bạn tự đổi lại nhé)
+        val cursor = db.rawQuery("SELECT * FROM Notifications ORDER BY notify_id DESC", null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val noti = NotificationModel(
+                    notifyId = cursor.getInt(cursor.getColumnIndexOrThrow("notify_id")),
+                    title = cursor.getString(cursor.getColumnIndexOrThrow("title")),
+                    content = cursor.getString(cursor.getColumnIndexOrThrow("content")),
+                    type = cursor.getString(cursor.getColumnIndexOrThrow("type")),
+                    createdAt = cursor.getString(cursor.getColumnIndexOrThrow("created_at"))
+                )
+                list.add(noti)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return list
+    }
 }

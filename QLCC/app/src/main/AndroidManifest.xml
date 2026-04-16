@@ -15,6 +15,7 @@
         <activity android:name=".AdminDashboardActivity" />
         <activity android:name=".ReportActivity" />
         <activity android:name=".ReportHistoryActivity" />
+        <activity android:name=".NotificationActivity" />
 
         <activity
             android:name=".LoginActivity"
