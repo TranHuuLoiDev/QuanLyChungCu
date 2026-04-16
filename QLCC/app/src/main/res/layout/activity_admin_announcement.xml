@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:fitsSystemWindows="true"
-    tools:context="com.example.myapplication.activity_admin_announcement">
+    tools:context="com.example.qlcc.">
 
     <LinearLayout
         android:layout_width="match_parent"
