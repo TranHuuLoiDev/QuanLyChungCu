@@ -53,6 +53,13 @@ class AdminDashboardActivity : AppCompatActivity() {
             builder.show()
         }
 
+        // Click trạng thái căn hộ
+        val btnManageRooms = findViewById<androidx.cardview.widget.CardView>(R.id.btnManageRooms)
+
+        btnManageRooms.setOnClickListener {
+            val intent = Intent(this, AdminApartmentActivity::class.java)
+            startActivity(intent)
+        }
         // --- CÁC NÚT CHỨC NĂNG KHÁC (Sẽ code tiếp ở các bài sau) ---
         val btnManageUsers = findViewById<androidx.cardview.widget.CardView>(R.id.btnManageUsers)
         btnManageUsers.setOnClickListener {

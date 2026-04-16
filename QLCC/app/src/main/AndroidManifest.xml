@@ -13,6 +13,9 @@
 
         <activity android:name=".HomeUserActivity" />
         <activity android:name=".AdminDashboardActivity" />
+        <activity
+            android:name="com.example.qlcc.AdminApartmentActivity"
+            android:exported="false" />
         <activity android:name=".ReportActivity" />
         <activity android:name=".ReportHistoryActivity" />
         <activity android:name=".NotificationActivity" />

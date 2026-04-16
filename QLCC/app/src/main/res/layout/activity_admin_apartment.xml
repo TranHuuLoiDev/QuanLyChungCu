@@ -37,54 +37,23 @@
             android:layout_weight="1"
             android:padding="16dp" />
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/imgApartment"
-        android:layout_width="150dp"
-        android:layout_height="110dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/apartment100"
-        android:contentDescription="Ảnh căn hộ"
-        android:layout_gravity="center" />
-
-    <TextView
-        android:id="@+id/tvName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Căn hộ 101"
-        android:textSize="17sp"
-        android:textStyle="bold"
-        android:layout_gravity="center"
-        android:layout_marginTop="8dp" />
-
-    <TextView
-        android:id="@+id/tvInfo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="2PN • 78m²"
-        android:textSize="14sp"
-        android:layout_gravity="center"
-        android:layout_marginTop="4dp" />
-
-    <TextView
-        android:id="@+id/tvStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Còn trống"
-        android:textSize="14sp"
-        android:textColor="#006400"
-        android:background="#D4EDDA"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="6dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="8dp" />
-
     <!-- Danh sách căn hộ của tầng được chọn -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewApartments"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="8dp" />
+
+    <!-- Floating Action Button - Thêm căn hộ mới -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddApartment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:src="@android:drawable/ic_input_add"
+        app:backgroundTint="#FF9800"
+        app:tint="#FFFFFF"
+        android:layout_gravity="bottom|end" />
 
 
 </LinearLayout>
