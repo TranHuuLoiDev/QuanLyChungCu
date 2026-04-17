@@ -14,6 +14,7 @@ class ApartmentAdapter(private val apartments: List<Apartment>) :
         val imgApartment: ImageView = view.findViewById(R.id.imgApartment)
         val tvName: TextView = view.findViewById(R.id.tvName)
         val tvInfo: TextView = view.findViewById(R.id.tvInfo)
+        val tvDesc: TextView = view.findViewById(R.id.tvDesc)
         val tvStatus: TextView = view.findViewById(R.id.tvStatus)
     }
 
@@ -25,11 +26,12 @@ class ApartmentAdapter(private val apartments: List<Apartment>) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val apt = apartments[position]
-        holder.imgApartment.setImageResource(apt.imageRes)
-        holder.tvName.text = apt.name
-        holder.tvInfo.text = apt.info
-        holder.tvStatus.text = apt.status
-    }
 
+        holder.imgApartment.setImageResource(apt.imageRes)
+        holder.tvName.text = apt.name                    // Sử dụng name từ property
+        holder.tvInfo.text = apt.area ?: "Không có diện tích"
+        holder.tvStatus.text = apt.status ?: "Còn trống"
+        holder.tvDesc.text = apt.desc ?: "Không có mô tả"
+    }
     override fun getItemCount() = apartments.size
 }

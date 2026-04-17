@@ -42,6 +42,7 @@
         android:id="@+id/recyclerViewApartments"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_weight="1"
         android:padding="8dp" />
 
     <!-- Floating Action Button - Thêm căn hộ mới -->

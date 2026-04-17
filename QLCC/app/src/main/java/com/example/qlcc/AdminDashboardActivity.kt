@@ -8,6 +8,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 
 class AdminDashboardActivity : AppCompatActivity() {
 
@@ -53,8 +54,8 @@ class AdminDashboardActivity : AppCompatActivity() {
             builder.show()
         }
 
-        // Click trạng thái căn hộ
-        val btnManageRooms = findViewById<androidx.cardview.widget.CardView>(R.id.btnManageRooms)
+        // 5. Click vào "Trạng thái Căn hộ" → chuyển sang AdminApartmentActivity
+        val btnManageRooms = findViewById<CardView>(R.id.btnManageRooms)
 
         btnManageRooms.setOnClickListener {
             val intent = Intent(this, AdminApartmentActivity::class.java)

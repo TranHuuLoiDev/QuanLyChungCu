@@ -5,42 +5,53 @@
     android:orientation="vertical"
     android:padding="12dp"
     android:background="#FFFFFF"
-    android:elevation="4dp"
-    android:layout_margin="8dp">
+    android:layout_margin="8dp"
+    android:elevation="4dp">
 
+    <!-- Ảnh căn hộ -->
     <ImageView
         android:id="@+id/imgApartment"
-        android:layout_width="150dp"
+        android:layout_width="160dp"
         android:layout_height="110dp"
         android:scaleType="fitCenter"
         android:src="@drawable/apartment100"
         android:contentDescription="Ảnh căn hộ"
         android:layout_gravity="center" />
 
+    <!-- Tên căn hộ -->
     <TextView
         android:id="@+id/tvName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Căn hộ 101"
-        android:textSize="17sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         android:layout_gravity="center"
         android:layout_marginTop="8dp" />
 
+    <!-- Thông tin (diện tích) -->
     <TextView
         android:id="@+id/tvInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="2PN • 78m²"
         android:textSize="14sp"
         android:layout_gravity="center"
         android:layout_marginTop="4dp" />
 
+    <!-- Mô tả (room_desc) -->
+    <TextView
+        android:id="@+id/tvDesc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        android:textColor="#666666"
+        android:layout_gravity="center"
+        android:layout_marginTop="2dp" />
+
+    <!-- Trạng thái -->
     <TextView
         android:id="@+id/tvStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Còn trống"
         android:textSize="14sp"
         android:textColor="#006400"
         android:background="#D4EDDA"

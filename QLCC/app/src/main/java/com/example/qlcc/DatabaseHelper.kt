@@ -146,4 +146,36 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         cursor.close()
         return list
     }
+
+    // Lấy danh sách căn hộ theo tầng từ database
+    fun getApartmentsByFloor(floor: Int): List<Apartment> {
+        val list = mutableListOf<Apartment>()
+        val db = this.readableDatabase
+
+        try {
+            val cursor = db.rawQuery(
+                "SELECT * FROM Apartments WHERE room_id LIKE ? ORDER BY room_id ASC",
+                arrayOf("$floor%")
+            )
+
+            if (cursor.moveToFirst()) {
+                do {
+                    val apartment = Apartment(
+                        roomId = cursor.getString(cursor.getColumnIndexOrThrow("room_id")),
+                        area = cursor.getString(cursor.getColumnIndexOrThrow("room_area")),
+                        status = cursor.getString(cursor.getColumnIndexOrThrow("room_status")),
+                        desc = cursor.getString(cursor.getColumnIndexOrThrow("room_desc"))
+                    )
+                    list.add(apartment)
+                } while (cursor.moveToNext())
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
+
+        return list
+    }
 }
