@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.resident_control)
+        setContentView(R.layout.resident_list)
 
         recyclerView = findViewById(R.id.recyclerView)
         btnThem = findViewById(R.id.btnThem)
