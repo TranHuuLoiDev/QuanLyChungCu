@@ -21,6 +21,7 @@
         <activity android:name=".NotificationActivity" />
         <activity android:name=".AdminInvoiceActivity" />
         <activity android:name=".AdminBillEditorActivity" />
+        <activity android:name=".UserInvoiceActivity" />
 
         <activity
             android:name=".LoginActivity"

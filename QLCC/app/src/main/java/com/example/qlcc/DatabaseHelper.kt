@@ -257,4 +257,47 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         db.close()
         return result > 0
     }
+
+
+    // ==========================================
+    // Hàm lấy danh sách Hóa đơn cho USER (Theo mã phòng)
+    // ==========================================
+    fun getInvoicesByRoom(roomId: String): List<Invoice> {
+        val list = mutableListOf<Invoice>()
+        val db = this.readableDatabase
+        // Chỉ lấy hóa đơn có mã phòng khớp với tham số truyền vào
+        val cursor = db.rawQuery("SELECT * FROM Invoices WHERE room_id = ? ORDER BY invoice_id DESC", arrayOf(roomId))
+
+        if (cursor.moveToFirst()) {
+            do {
+                val invoice = Invoice(
+                    invoiceId = cursor.getInt(cursor.getColumnIndexOrThrow("invoice_id")),
+                    roomId = cursor.getString(cursor.getColumnIndexOrThrow("room_id")),
+                    invoiceTitle = cursor.getString(cursor.getColumnIndexOrThrow("invoice_title")),
+                    amount = cursor.getDouble(cursor.getColumnIndexOrThrow("amount")),
+                    createdDate = cursor.getString(cursor.getColumnIndexOrThrow("created_date")),
+                    status = cursor.getString(cursor.getColumnIndexOrThrow("status"))
+                )
+                list.add(invoice)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return list
+    }
+
+    // ==========================================
+    // Hàm đếm số Hóa đơn CHƯA THANH TOÁN của 1 phòng
+    // ==========================================
+    fun getUnpaidInvoiceCount(roomId: String): Int {
+        val db = this.readableDatabase
+        var count = 0
+        // Đếm số dòng thỏa mãn 2 điều kiện: đúng phòng đó VÀ trạng thái là chưa thanh toán
+        val cursor = db.rawQuery("SELECT COUNT(*) FROM Invoices WHERE room_id = ? AND status = 'Chưa thanh toán'", arrayOf(roomId))
+
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0)
+        }
+        cursor.close()
+        return count
+    }
 }
