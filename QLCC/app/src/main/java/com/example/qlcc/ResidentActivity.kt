@@ -1,44 +1,83 @@
 package com.example.qlcc
- import android.os.Bundle
- import android.widget.Toast
- import androidx.appcompat.app.AppCompatActivity
- import androidx.recyclerview.widget.LinearLayoutManager
- import androidx.recyclerview.widget.RecyclerView
- import com.google.android.material.floatingactionbutton.FloatingActionButton
- class ResidentActivity : AppCompatActivity() {
 
-     private lateinit var recyclerView: RecyclerView
-     private lateinit var btnThem: FloatingActionButton
-     private lateinit var dbHelper: DatabaseHelper
-     private lateinit var adapter: ResidentAdapter
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-     override fun onCreate(savedInstanceState: Bundle?) {
-         super.onCreate(savedInstanceState)
-         setContentView(R.layout.resident_list)
+class ResidentActivity : AppCompatActivity() {
 
-         dbHelper = DatabaseHelper(this)
-         recyclerView = findViewById(R.id.recyclerView)
-         btnThem = findViewById(R.id.btnThem)
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var btnThem: FloatingActionButton
+    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var adapter: ResidentAdapter
 
-         recyclerView.layoutManager = LinearLayoutManager(this)
-         
-         loadResidentList()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.resident_list)
 
-         btnThem.setOnClickListener {
-             Toast.makeText(this, "Tính năng Thêm cư dân sẽ được cập nhật", Toast.LENGTH_SHORT).show()
-         }
-     }
+        dbHelper = DatabaseHelper(this)
+        recyclerView = findViewById(R.id.recyclerView)
+        btnThem = findViewById(R.id.btnThem)
 
-     private fun loadResidentList() {
-         val list = dbHelper.getAllUsers()
-         adapter = ResidentAdapter(list, 
-             onEditClick = { user ->
-                 Toast.makeText(this, "Sửa: ${user.fullName}", Toast.LENGTH_SHORT).show()
-             },
-             onDeleteClick = { user ->
-                 Toast.makeText(this, "Xóa: ${user.fullName}", Toast.LENGTH_SHORT).show()
-             }
-         )
-         recyclerView.adapter = adapter
-     }
- }
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        
+        loadResidentList()
+
+        btnThem.setOnClickListener {
+            showAddResidentDialog()
+        }
+    }
+
+    private fun showAddResidentDialog() {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_resident, null)
+        val edtUsername = dialogView.findViewById<EditText>(R.id.edtUsername)
+        val edtPassword = dialogView.findViewById<EditText>(R.id.edtPassword)
+        val edtFullName = dialogView.findViewById<EditText>(R.id.edtFullName)
+        val edtPhoneNumber = dialogView.findViewById<EditText>(R.id.edtPhoneNumber)
+        val edtRoomID = dialogView.findViewById<EditText>(R.id.edtRoomID)
+
+        AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setPositiveButton("Thêm") { _, _ ->
+                val username = edtUsername.text.toString().trim()
+                val password = edtPassword.text.toString().trim()
+                val fullName = edtFullName.text.toString().trim()
+                val phone = edtPhoneNumber.text.toString().trim()
+                val roomID = edtRoomID.text.toString().trim()
+
+                if (username.isEmpty() || password.isEmpty() || fullName.isEmpty() || phone.isEmpty() || roomID.isEmpty()) {
+                    Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show()
+                } else {
+                    val success = dbHelper.insertUser(username, password, fullName, phone, roomID)
+                    if (success) {
+                        Toast.makeText(this, "Thêm cư dân thành công", Toast.LENGTH_SHORT).show()
+                        loadResidentList()
+                    } else {
+                        Toast.makeText(this, "Lỗi khi thêm cư dân", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            .setNegativeButton("Hủy", null)
+            .create()
+            .show()
+    }
+
+    private fun loadResidentList() {
+        val list = dbHelper.getAllUsers()
+        adapter = ResidentAdapter(list, 
+            onEditClick = { user ->
+                Toast.makeText(this, "Sửa: ${user.fullName}", Toast.LENGTH_SHORT).show()
+            },
+            onDeleteClick = { user ->
+                Toast.makeText(this, "Xóa: ${user.fullName}", Toast.LENGTH_SHORT).show()
+            }
+        )
+        recyclerView.adapter = adapter
+    }
+}
