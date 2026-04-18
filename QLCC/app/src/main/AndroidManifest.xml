@@ -19,6 +19,8 @@
         <activity android:name=".ReportActivity" />
         <activity android:name=".ReportHistoryActivity" />
         <activity android:name=".NotificationActivity" />
+        <activity android:name=".AdminInvoiceActivity" />
+        <activity android:name=".AdminBillEditorActivity" />
 
         <activity
             android:name=".LoginActivity"

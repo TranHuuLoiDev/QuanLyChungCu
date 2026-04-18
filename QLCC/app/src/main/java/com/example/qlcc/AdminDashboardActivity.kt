@@ -66,5 +66,28 @@ class AdminDashboardActivity : AppCompatActivity() {
         btnManageUsers.setOnClickListener {
             Toast.makeText(this, "Chức năng Quản lý cư dân đang phát triển", Toast.LENGTH_SHORT).show()
         }
+
+        // 6. Kích hoạt nút "Xuất Hóa đơn" -> Chuyển sang AdminInvoiceActivity
+        val btnManageInvoices = findViewById<CardView>(R.id.btnManageInvoices)
+        btnManageInvoices.setOnClickListener {
+            val intent = Intent(this, AdminInvoiceActivity::class.java)
+            startActivity(intent)
+        }
+
+        // 7. Cài đặt tạm thời cho các nút còn lại (Để bấm vào không bị lỗi)
+        val btnSendNotices = findViewById<CardView>(R.id.btnSendNotices)
+        btnSendNotices.setOnClickListener {
+            Toast.makeText(this, "Chức năng Gửi Thông báo đang phát triển", Toast.LENGTH_SHORT).show()
+        }
+
+        val btnManageVehicles = findViewById<CardView>(R.id.btnManageVehicles)
+        btnManageVehicles.setOnClickListener {
+            Toast.makeText(this, "Chức năng Phương tiện đang phát triển", Toast.LENGTH_SHORT).show()
+        }
+
+        val btnViewReports = findViewById<CardView>(R.id.btnViewReports)
+        btnViewReports.setOnClickListener {
+            Toast.makeText(this, "Chức năng Xem Báo cáo đang phát triển", Toast.LENGTH_SHORT).show()
+        }
     }
 }

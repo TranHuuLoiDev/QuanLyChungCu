@@ -183,4 +183,78 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         db.close()
         return result > 0 // Trả về true nếu cập nhật thành công
     }
+
+    // Hàm lấy danh sách tất cả Hóa đơn cho ADMIN
+    // ==========================================
+    fun getAllInvoices(): List<Invoice> {
+        val list = mutableListOf<Invoice>()
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM Invoices ORDER BY invoice_id DESC", null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val invoice = Invoice(
+                    invoiceId = cursor.getInt(cursor.getColumnIndexOrThrow("invoice_id")),
+                    roomId = cursor.getString(cursor.getColumnIndexOrThrow("room_id")),
+                    invoiceTitle = cursor.getString(cursor.getColumnIndexOrThrow("invoice_title")),
+                    amount = cursor.getDouble(cursor.getColumnIndexOrThrow("amount")),
+                    createdDate = cursor.getString(cursor.getColumnIndexOrThrow("created_date")),
+                    status = cursor.getString(cursor.getColumnIndexOrThrow("status"))
+                )
+                list.add(invoice)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return list
+    }
+
+    // Hàm tạo Hóa đơn mới
+    // ==========================================
+    fun insertInvoice(roomId: String, title: String, amount: Double, createdDate: String): Boolean {
+        val db = this.writableDatabase
+        val values = android.content.ContentValues()
+        values.put("room_id", roomId)
+        values.put("invoice_title", title)
+        values.put("amount", amount)
+        values.put("created_date", createdDate)
+        values.put("status", "Chưa thanh toán") // Mặc định khi mới tạo là chưa thanh toán
+
+        val result = db.insert("Invoices", null, values)
+        db.close()
+        return result != -1L // Trả về true nếu lưu thành công
+    }
+
+    // Hàm để ADMIN cập nhật trạng thái Hóa đơn
+    fun updateInvoiceStatus(invoiceId: Int, newStatus: String): Boolean {
+        val db = this.writableDatabase
+        val values = android.content.ContentValues()
+        values.put("status", newStatus)
+
+        val result = db.update("Invoices", values, "invoice_id = ?", arrayOf(invoiceId.toString()))
+        db.close()
+        return result > 0
+    }
+
+    // Hàm cập nhật toàn bộ thông tin hóa đơn (Dùng khi chỉnh sửa chi tiết)
+    fun updateFullInvoice(invoice: Invoice): Boolean {
+        val db = this.writableDatabase
+        val values = android.content.ContentValues()
+        values.put("room_id", invoice.roomId)
+        values.put("invoice_title", invoice.invoiceTitle)
+        values.put("amount", invoice.amount)
+        values.put("created_date", invoice.createdDate)
+        values.put("status", invoice.status)
+
+        val result = db.update("Invoices", values, "invoice_id = ?", arrayOf(invoice.invoiceId.toString()))
+        db.close()
+        return result > 0
+    }
+
+    // Hàm xóa hóa đơn theo ID
+    fun deleteInvoice(invoiceId: Int): Boolean {
+        val db = this.writableDatabase
+        val result = db.delete("Invoices", "invoice_id = ?", arrayOf(invoiceId.toString()))
+        db.close()
+        return result > 0
+    }
 }
