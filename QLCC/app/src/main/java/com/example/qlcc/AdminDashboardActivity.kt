@@ -79,8 +79,8 @@ class AdminDashboardActivity : AppCompatActivity() {
         // 8. Cài đặt tạm thời cho các nút còn lại (Để bấm vào không bị lỗi)
         val btnSendNotices = findViewById<CardView>(R.id.btnSendNotices)
         btnSendNotices.setOnClickListener {
-            Toast.makeText(this, "Chức năng Gửi Thông báo đang phát triển", Toast.LENGTH_SHORT).show()
-        }
+            val intent = Intent(this, AdminAnnouncementActivity::class.java)
+             startActivity(intent)
 
         val btnManageVehicles = findViewById<CardView>(R.id.btnManageVehicles)
         btnManageVehicles.setOnClickListener {
