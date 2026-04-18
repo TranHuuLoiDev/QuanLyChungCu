@@ -19,8 +19,7 @@
         <ImageView
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:src="@android:drawable/ic_dialog_map"
-            app:tint="#757575" />
+            android:src="@drawable/apartment100" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -46,6 +45,16 @@
                 android:text="Diện tích: 65.5 m2"
                 android:textColor="#666666"
                 android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvRoomDesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Mô tả: Nội thất cơ bản"
+                android:textColor="#888888"
+                android:textSize="13sp"
+                android:textStyle="italic" />
         </LinearLayout>
 
         <TextView

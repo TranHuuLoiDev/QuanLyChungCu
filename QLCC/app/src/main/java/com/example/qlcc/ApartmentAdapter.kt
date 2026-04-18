@@ -6,16 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import androidx.core.graphics.toColorInt
 
 class ApartmentAdapter(
     private val aptList: List<Apartment>,
-    private val onAptClick: (Apartment) -> Unit // Bắt sự kiện khi Admin bấm vào 1 phòng
+    private val onAptClick: (Apartment) -> Unit
 ) : RecyclerView.Adapter<ApartmentAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvRoomId: TextView = view.findViewById(R.id.tvRoomId)
         val tvRoomArea: TextView = view.findViewById(R.id.tvRoomArea)
         val tvRoomStatus: TextView = view.findViewById(R.id.tvRoomStatus)
+        // Bổ sung thêm dòng ánh xạ này
+        val tvRoomDesc: TextView = view.findViewById(R.id.tvRoomDesc)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -30,23 +33,24 @@ class ApartmentAdapter(
         holder.tvRoomArea.text = "Diện tích: ${apt.roomArea} m²"
         holder.tvRoomStatus.text = apt.roomStatus
 
-        // Đổi màu nền và màu chữ tùy theo trạng thái cho trực quan
+        // Gắn dữ liệu mô tả (nếu null thì hiện chữ "Chưa có mô tả")
+        holder.tvRoomDesc.text = apt.roomDesc ?: "Chưa có mô tả"
+
         when (apt.roomStatus) {
             "Trống" -> {
-                holder.tvRoomStatus.setTextColor(Color.parseColor("#2E7D32")) // Xanh lá
-                holder.tvRoomStatus.setBackgroundColor(Color.parseColor("#E8F5E9"))
+                holder.tvRoomStatus.setTextColor("#2E7D32".toColorInt())
+                holder.tvRoomStatus.setBackgroundColor("#E8F5E9".toColorInt())
             }
             "Đang ở" -> {
-                holder.tvRoomStatus.setTextColor(Color.parseColor("#1565C0")) // Xanh dương
-                holder.tvRoomStatus.setBackgroundColor(Color.parseColor("#E3F2FD"))
+                holder.tvRoomStatus.setTextColor("#1565C0".toColorInt())
+                holder.tvRoomStatus.setBackgroundColor("#E3F2FD".toColorInt())
             }
-            else -> { // Ví dụ: Sửa chữa
-                holder.tvRoomStatus.setTextColor(Color.parseColor("#E65100")) // Cam
-                holder.tvRoomStatus.setBackgroundColor(Color.parseColor("#FFF3E0"))
+            else -> {
+                holder.tvRoomStatus.setTextColor("#E65100".toColorInt())
+                holder.tvRoomStatus.setBackgroundColor("#FFF3E0".toColorInt())
             }
         }
 
-        // Bắt sự kiện click vào cả cái thẻ (CardView)
         holder.itemView.setOnClickListener {
             onAptClick(apt)
         }
