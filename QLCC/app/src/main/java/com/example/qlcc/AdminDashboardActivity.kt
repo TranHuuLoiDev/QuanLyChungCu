@@ -53,10 +53,14 @@ class AdminDashboardActivity : AppCompatActivity() {
             builder.setNegativeButton("Hủy", null)
             builder.show()
         }
+        // --- CÁC NÚT CHỨC NĂNG KHÁC ---
+        val btnManageUsers = findViewById<androidx.cardview.widget.CardView>(R.id.btnManageUsers)
+        btnManageUsers.setOnClickListener {
+            Toast.makeText(this, "Chức năng Quản lý cư dân đang phát triển", Toast.LENGTH_SHORT).show()
+        }
 
         // 5. Click vào "Trạng thái Căn hộ" → chuyển sang AdminApartmentActivity
         val btnManageRooms = findViewById<CardView>(R.id.btnManageRooms)
-
         btnManageRooms.setOnClickListener {
             val intent = Intent(this, AdminApartmentActivity::class.java)
             startActivity(intent)
