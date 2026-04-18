@@ -324,4 +324,45 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         cursor.close()
         return list
     }
+// ==========================================
+    // Hàm THÊM CƯ DÂN MỚI
+    // ==========================================
+    fun insertUser(userName: String, pass: String, fullName: String, phone: String, roomID: String): Boolean {
+        val db = this.writableDatabase
+        val values = android.content.ContentValues()
+        values.put("user_name", userName)
+        values.put("user_password", pass)
+        values.put("user_fullname", fullName)
+        values.put("user_phonenumber", phone)
+        values.put("user_roomID", roomID)
+
+        val result = db.insert("Users", null, values)
+        db.close()
+        return result != -1L
+    }
+
+    // ==========================================
+    // Hàm cập nhật CƯ DÂN
+    // ==========================================
+    fun updateUser(user: User): Boolean {
+        val db = this.writableDatabase
+        val values = android.content.ContentValues()
+        values.put("user_fullname", user.fullName)
+        values.put("user_phonenumber", user.phoneNumber)
+        values.put("user_roomID", user.roomID)
+
+        val result = db.update("Users", values, "user_id = ?", arrayOf(user.userId.toString()))
+        db.close()
+        return result > 0
+    }
+
+    // ==========================================
+    // Hàm xóa CƯ DÂN
+    // ==========================================
+    fun deleteUser(userId: Int): Boolean {
+        val db = this.writableDatabase
+        val result = db.delete("Users", "user_id = ?", arrayOf(userId.toString()))
+        db.close()
+        return result > 0
+    }
 }
