@@ -81,6 +81,7 @@ class AdminDashboardActivity : AppCompatActivity() {
         btnSendNotices.setOnClickListener {
             val intent = Intent(this, AdminAnnouncementActivity::class.java)
              startActivity(intent)
+        }
 
         val btnManageVehicles = findViewById<CardView>(R.id.btnManageVehicles)
         btnManageVehicles.setOnClickListener {
