@@ -13,8 +13,8 @@
 
         <activity android:name=".HomeUserActivity" />
         <activity android:name=".AdminDashboardActivity" />
-         <activity android:name=".ResidentActivity" />
-
+        <activity android:name=".ResidentActivity" />
+        <activity android:name=".AdminAnnouncementActivity" />
         <activity android:name=".AdminApartmentActivity" />
 
         <activity android:name=".ReportActivity" />
