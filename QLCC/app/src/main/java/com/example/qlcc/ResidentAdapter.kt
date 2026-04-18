@@ -3,7 +3,7 @@ package com.example.qlcc
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
@@ -18,8 +18,8 @@ class ResidentAdapter(
         val tvHoTen: TextView = itemView.findViewById(R.id.tvHoTen)
         val tvSoDienThoai: TextView = itemView.findViewById(R.id.tvSoDienThoai)
         val tvSoPhong: TextView = itemView.findViewById(R.id.tvSoPhong)
-        val btnSua: Button = itemView.findViewById(R.id.btnSua)
-        val btnXoa: Button = itemView.findViewById(R.id.btnXoa)
+        val btnSua: ImageView = itemView.findViewById(R.id.btnSua)
+        val btnXoa: ImageView = itemView.findViewById(R.id.btnXoa)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResidentViewHolder {
