@@ -2,6 +2,7 @@ package com.example.qlcc
 
 import android.os.Bundle
 import android.view.LayoutInflater
+ import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -61,9 +62,48 @@ class ResidentActivity : AppCompatActivity() {
                         loadResidentList()
                     } else {
                         Toast.makeText(this, "Lỗi khi thêm cư dân", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
+                     }
+                 }
+             }
+             .setNegativeButton("Hủy", null)
+             .create()
+             .show()
+     }
+​
+     private fun showEditResidentDialog(user: User) {
+         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_resident, null)
+         val edtUsername = dialogView.findViewById<EditText>(R.id.edtUsername)
+         val edtPassword = dialogView.findViewById<EditText>(R.id.edtPassword)
+         val edtFullName = dialogView.findViewById<EditText>(R.id.edtFullName)
+         val edtPhoneNumber = dialogView.findViewById<EditText>(R.id.edtPhoneNumber)
+         val edtRoomID = dialogView.findViewById<EditText>(R.id.edtRoomID)
+​
+         edtUsername.setText(user.userName)
+         edtUsername.isEnabled = false 
+         edtPassword.visibility = View.GONE 
+         
+         edtFullName.setText(user.fullName)
+         edtPhoneNumber.setText(user.phoneNumber)
+         edtRoomID.setText(user.roomID)
+​
+         AlertDialog.Builder(this)
+             .setTitle("Chỉnh sửa cư dân")
+             .setView(dialogView)
+             .setPositiveButton("Cập nhật") { _, _ ->
+                 val fullName = edtFullName.text.toString().trim()
+                 val phone = edtPhoneNumber.text.toString().trim()
+                 val roomID = edtRoomID.text.toString().trim()
+​
+                 if (fullName.isEmpty() || phone.isEmpty() || roomID.isEmpty()) {
+                     Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show()
+                 } else {
+                     val updatedUser = User(user.userId, user.userName, fullName, phone, roomID)
+                     val success = dbHelper.updateUser(updatedUser)
+                     if (success) {
+                         Toast.makeText(this, "Cập nhật thành công", Toast.LENGTH_SHORT).show()
+                         loadResidentList() 
+                     } else {
+                         Toast.makeText(this, "Lỗi khi cập nhật", Toast.LENGTH_SHORT).show()
             .setNegativeButton("Hủy", null)
             .create()
             .show()
@@ -73,7 +113,7 @@ class ResidentActivity : AppCompatActivity() {
         val list = dbHelper.getAllUsers()
         adapter = ResidentAdapter(list, 
             onEditClick = { user ->
-                Toast.makeText(this, "Sửa: ${user.fullName}", Toast.LENGTH_SHORT).show()
+              showEditResidentDialog(user)
             },
             onDeleteClick = { user ->
                showDeleteConfirmDialog(user)
