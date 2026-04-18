@@ -62,19 +62,21 @@ class AdminDashboardActivity : AppCompatActivity() {
             startActivity(intent)
         }
         // --- CÁC NÚT CHỨC NĂNG KHÁC (Sẽ code tiếp ở các bài sau) ---
-        val btnManageUsers = findViewById<androidx.cardview.widget.CardView>(R.id.btnManageUsers)
-        btnManageUsers.setOnClickListener {
-            Toast.makeText(this, "Chức năng Quản lý cư dân đang phát triển", Toast.LENGTH_SHORT).show()
-        }
+        // 6. Quản lý cư dân - Chuyển sang ResidentActivity
+       val btnManageUsers = findViewById<CardView>(R.id.btnManageUsers)
+       btnManageUsers.setOnClickListener {
+            val intent = Intent(this, ResidentActivity::class.java)
+            startActivity(intent)
+       }
 
-        // 6. Kích hoạt nút "Xuất Hóa đơn" -> Chuyển sang AdminInvoiceActivity
+        // 7. Kích hoạt nút "Xuất Hóa đơn" -> Chuyển sang AdminInvoiceActivity
         val btnManageInvoices = findViewById<CardView>(R.id.btnManageInvoices)
         btnManageInvoices.setOnClickListener {
             val intent = Intent(this, AdminInvoiceActivity::class.java)
             startActivity(intent)
         }
 
-        // 7. Cài đặt tạm thời cho các nút còn lại (Để bấm vào không bị lỗi)
+        // 8. Cài đặt tạm thời cho các nút còn lại (Để bấm vào không bị lỗi)
         val btnSendNotices = findViewById<CardView>(R.id.btnSendNotices)
         btnSendNotices.setOnClickListener {
             Toast.makeText(this, "Chức năng Gửi Thông báo đang phát triển", Toast.LENGTH_SHORT).show()
