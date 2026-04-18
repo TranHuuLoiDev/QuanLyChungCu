@@ -43,6 +43,7 @@ class ResidentActivity : AppCompatActivity() {
         val edtRoomID = dialogView.findViewById<EditText>(R.id.edtRoomID)
 
         AlertDialog.Builder(this)
+            .setTitle("Thêm cư dân mới")
             .setView(dialogView)
             .setPositiveButton("Thêm") { _, _ ->
                 val username = edtUsername.text.toString().trim()
@@ -75,9 +76,26 @@ class ResidentActivity : AppCompatActivity() {
                 Toast.makeText(this, "Sửa: ${user.fullName}", Toast.LENGTH_SHORT).show()
             },
             onDeleteClick = { user ->
-                Toast.makeText(this, "Xóa: ${user.fullName}", Toast.LENGTH_SHORT).show()
+               showDeleteConfirmDialog(user)
             }
         )
         recyclerView.adapter = adapter
+     }
+
+    private fun showDeleteConfirmDialog(user: User) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Xác nhận xóa")
+        builder.setMessage("Bạn có chắc chắn muốn xóa cư dân ${user.fullName}?")
+        builder.setPositiveButton("Xóa") { _, _ ->
+            val success = dbHelper.deleteUser(user.userId)
+            if (success) {
+                Toast.makeText(this, "Đã xóa cư dân", Toast.LENGTH_SHORT).show()
+                loadResidentList() 
+            } else {
+                Toast.makeText(this, "Lỗi khi xóa cư dân", Toast.LENGTH_SHORT).show()
+            }
+        }
+        builder.setNegativeButton("Hủy", null)
+        builder.show()
     }
 }
