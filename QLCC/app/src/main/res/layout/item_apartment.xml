@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="12dp"
-    android:background="#FFFFFF"
-    android:layout_margin="8dp"
-    android:elevation="4dp">
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="3dp">
 
-    <!-- Ảnh căn hộ -->
-    <ImageView
-        android:id="@+id/imgApartment"
-        android:layout_width="160dp"
-        android:layout_height="110dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/apartment100"
-        android:contentDescription="Ảnh căn hộ"
-        android:layout_gravity="center" />
-
-    <!-- Tên căn hộ -->
-    <TextView
-        android:id="@+id/tvName"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_gravity="center"
-        android:layout_marginTop="8dp" />
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
 
-    <!-- Thông tin (diện tích) -->
-    <TextView
-        android:id="@+id/tvInfo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:layout_gravity="center"
-        android:layout_marginTop="4dp" />
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@android:drawable/ic_dialog_map"
+            app:tint="#757575" />
 
-    <!-- Mô tả (room_desc) -->
-    <TextView
-        android:id="@+id/tvDesc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="13sp"
-        android:textColor="#666666"
-        android:layout_gravity="center"
-        android:layout_marginTop="2dp" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical">
 
-    <!-- Trạng thái -->
-    <TextView
-        android:id="@+id/tvStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="#006400"
-        android:background="#D4EDDA"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="6dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="8dp" />
+            <TextView
+                android:id="@+id/tvRoomId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phòng A-101"
+                android:textColor="#333333"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
-</LinearLayout>
+            <TextView
+                android:id="@+id/tvRoomArea"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Diện tích: 65.5 m2"
+                android:textColor="#666666"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvRoomStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#E8F5E9"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:text="Trống"
+            android:textColor="#2E7D32"
+            android:textStyle="bold"
+            android:textSize="14sp" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

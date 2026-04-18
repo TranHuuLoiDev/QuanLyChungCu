@@ -1,68 +1,71 @@
 package com.example.qlcc
 
 import android.os.Bundle
-import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Spinner
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class AdminApartmentActivity : AppCompatActivity() {
 
-    private lateinit var spinnerFloor: Spinner
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var fabAdd: FloatingActionButton
+    private lateinit var rvApartments: RecyclerView
     private lateinit var dbHelper: DatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_admin_apartment)
 
+        // 1. Cài đặt Toolbar
+        val toolbar = findViewById<Toolbar>(R.id.toolbarAdminApt)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val upArrow = ContextCompat.getDrawable(this, android.R.drawable.ic_menu_revert)
+        upArrow?.setTint(ContextCompat.getColor(this, android.R.color.white))
+        supportActionBar?.setHomeAsUpIndicator(upArrow)
+        toolbar.setNavigationOnClickListener { finish() }
+
+        // 2. Ánh xạ và khởi tạo
+        rvApartments = findViewById(R.id.rvAdminApartments)
+        rvApartments.layoutManager = LinearLayoutManager(this)
         dbHelper = DatabaseHelper(this)
 
-        spinnerFloor = findViewById(R.id.spinnerFloor)
-        recyclerView = findViewById(R.id.recyclerViewApartments)
-        fabAdd = findViewById(R.id.fabAddApartment)
-
-        recyclerView.layoutManager = GridLayoutManager(this, 2)
-
-        // Danh sách tầng
-        val floors = listOf("Tầng 1", "Tầng 2", "Tầng 3", "Tầng 4", "Tầng 5")
-        val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, floors)
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerFloor.adapter = spinnerAdapter
-
-        // Mặc định load tầng 1
-        loadApartmentsForFloor(1)
-
-        // Sự kiện chọn tầng
-        spinnerFloor.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selectedFloor = position + 1
-                loadApartmentsForFloor(selectedFloor)
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {}
-        }
-
-        fabAdd.setOnClickListener {
-            Toast.makeText(this, "Chức năng thêm căn hộ mới đang phát triển...", Toast.LENGTH_SHORT).show()
-        }
+        loadApartmentList()
     }
 
-    // === LOAD DỮ LIỆU TỪ DATABASE THEO TẦNG ===
-    private fun loadApartmentsForFloor(floor: Int) {
-        val apartments = dbHelper.getApartmentsByFloor(floor)
+    // Hàm lấy dữ liệu và hiển thị lên RecyclerView
+    private fun loadApartmentList() {
+        val list = dbHelper.getAllApartments()
+        val adapter = ApartmentAdapter(list) { selectedApt ->
+            // Khi Admin bấm vào một căn hộ, hiện Dialog chọn trạng thái
+            showUpdateStatusDialog(selectedApt)
+        }
+        rvApartments.adapter = adapter
+    }
 
-        if (apartments.isEmpty()) {
-            Toast.makeText(this, "Tầng $floor chưa có dữ liệu căn hộ", Toast.LENGTH_SHORT).show()
+    private fun showUpdateStatusDialog(apt: Apartment) {
+        val statuses = arrayOf("Trống", "Đang ở", "Sửa chữa")
+
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Cập nhật trạng thái phòng ${apt.roomId}")
+
+        builder.setItems(statuses) { _, which ->
+            val newStatus = statuses[which]
+
+            // Gọi hàm cập nhật vào Database
+            val isSuccess = dbHelper.updateApartmentStatus(apt.roomId, newStatus)
+
+            if (isSuccess) {
+                Toast.makeText(this, "Đã đổi trạng thái phòng ${apt.roomId} thành $newStatus", Toast.LENGTH_SHORT).show()
+                loadApartmentList() // Tải lại danh sách để cập nhật giao diện
+            } else {
+                Toast.makeText(this, "Cập nhật thất bại!", Toast.LENGTH_SHORT).show()
+            }
         }
 
-        val adapter = ApartmentAdapter(apartments)
-        recyclerView.adapter = adapter
+        builder.setNegativeButton("Hủy", null)
+        builder.show()
     }
 }

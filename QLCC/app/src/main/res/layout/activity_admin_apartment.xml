@@ -4,57 +4,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F8F9FA">
+    android:background="#F5F5F5">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbarAdmin"
+        android:id="@+id/toolbarAdminApt"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#FF9800"
-        app:title="Trang Quản Trị"
-        app:titleTextColor="#FFFFFF"
-        app:menu="@menu/menu_admin_apartment"/>
+        android:background="#1976D2"
+        app:title="Quản lý căn hộ"
+        app:titleTextColor="#FFFFFF" />
 
-    <!-- Chọn tầng bằng Spinner -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Chọn tầng: "
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <Spinner
-            android:id="@+id/spinnerFloor"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="16dp" />
-    </LinearLayout>
-    <!-- Danh sách căn hộ của tầng được chọn -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewApartments"
+        android:id="@+id/rvAdminApartments"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:padding="8dp" />
-
-    <!-- Floating Action Button - Thêm căn hộ mới -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAddApartment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="#FF9800"
-        app:tint="#FFFFFF"
-        android:layout_gravity="bottom|end" />
-
+        android:paddingTop="8dp"
+        android:clipToPadding="false" />
 
 </LinearLayout>

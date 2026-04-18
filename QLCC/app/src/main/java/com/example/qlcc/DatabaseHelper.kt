@@ -147,35 +147,40 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         return list
     }
 
-    // Lấy danh sách căn hộ theo tầng từ database
-    fun getApartmentsByFloor(floor: Int): List<Apartment> {
+    // ==========================================
+    // Hàm lấy danh sách tất cả căn hộ cho ADMIN
+    // ==========================================
+    fun getAllApartments(): List<Apartment> {
         val list = mutableListOf<Apartment>()
         val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM Apartments ORDER BY room_id ASC", null)
 
-        try {
-            val cursor = db.rawQuery(
-                "SELECT * FROM Apartments WHERE room_id LIKE ? ORDER BY room_id ASC",
-                arrayOf("$floor%")
-            )
-
-            if (cursor.moveToFirst()) {
-                do {
-                    val apartment = Apartment(
-                        roomId = cursor.getString(cursor.getColumnIndexOrThrow("room_id")),
-                        area = cursor.getString(cursor.getColumnIndexOrThrow("room_area")),
-                        status = cursor.getString(cursor.getColumnIndexOrThrow("room_status")),
-                        desc = cursor.getString(cursor.getColumnIndexOrThrow("room_desc"))
-                    )
-                    list.add(apartment)
-                } while (cursor.moveToNext())
-            }
-            cursor.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
-            db.close()
+        if (cursor.moveToFirst()) {
+            do {
+                val apt = Apartment(
+                    roomId = cursor.getString(cursor.getColumnIndexOrThrow("room_id")),
+                    roomStatus = cursor.getString(cursor.getColumnIndexOrThrow("room_status")),
+                    roomArea = cursor.getDouble(cursor.getColumnIndexOrThrow("room_area")),
+                    roomDesc = cursor.getString(cursor.getColumnIndexOrThrow("room_desc"))
+                )
+                list.add(apt)
+            } while (cursor.moveToNext())
         }
-
+        cursor.close()
         return list
+    }
+
+    // ==========================================
+    // Hàm để ADMIN cập nhật trạng thái căn hộ
+    // ==========================================
+    fun updateApartmentStatus(roomId: String, newStatus: String): Boolean {
+        val db = this.writableDatabase
+        val values = android.content.ContentValues()
+        values.put("room_status", newStatus) // Update đúng vào cột room_status
+
+        // Cập nhật dòng có room_id tương ứng
+        val result = db.update("Apartments", values, "room_id = ?", arrayOf(roomId))
+        db.close()
+        return result > 0 // Trả về true nếu cập nhật thành công
     }
 }
