@@ -12,6 +12,7 @@ package com.example.qlcc
      private lateinit var recyclerView: RecyclerView
      private lateinit var btnThem: FloatingActionButton
      private lateinit var dbHelper: DatabaseHelper
+     private lateinit var adapter: ResidentAdapter
 ​
      override fun onCreate(savedInstanceState: Bundle?) {
          super.onCreate(savedInstanceState)
@@ -23,11 +24,23 @@ package com.example.qlcc
 ​
          recyclerView.layoutManager = LinearLayoutManager(this)
          
-         // Tạm thời hiển thị thông báo vì chưa có Adapter
-         Toast.makeText(this, "Tính năng danh sách cư dân", Toast.LENGTH_SHORT).show()
+         loadResidentList()
 ​
          btnThem.setOnClickListener {
-             Toast.makeText(this, "Thêm cư dân mới", Toast.LENGTH_SHORT).show()
+             Toast.makeText(this, "Tính năng Thêm cư dân sẽ được cập nhật", Toast.LENGTH_SHORT).show()
          }
+     }
+​
+     private fun loadResidentList() {
+         val list = dbHelper.getAllUsers()
+         adapter = ResidentAdapter(list, 
+             onEditClick = { user ->
+                 Toast.makeText(this, "Sửa: ${user.fullName}", Toast.LENGTH_SHORT).show()
+             },
+             onDeleteClick = { user ->
+                 Toast.makeText(this, "Xóa: ${user.fullName}", Toast.LENGTH_SHORT).show()
+             }
+         )
+         recyclerView.adapter = adapter
      }
  }
