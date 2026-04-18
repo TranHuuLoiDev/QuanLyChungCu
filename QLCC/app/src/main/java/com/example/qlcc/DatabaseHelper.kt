@@ -300,4 +300,28 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         cursor.close()
         return count
     }
+
+    // ==========================================
+    // Hàm lấy danh sách tất cả CƯ DÂN 
+    // ==========================================
+    fun getAllUsers(): List<User> {
+        val list = mutableListOf<User>()
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM Users ORDER BY user_id ASC", null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val user = User(
+                    userId = cursor.getInt(cursor.getColumnIndexOrThrow("user_id")),
+                    userName = cursor.getString(cursor.getColumnIndexOrThrow("user_name")),
+                    fullName = cursor.getString(cursor.getColumnIndexOrThrow("user_fullname")),
+                    phoneNumber = cursor.getString(cursor.getColumnIndexOrThrow("user_phonenumber")),
+                    roomID = cursor.getString(cursor.getColumnIndexOrThrow("user_roomID"))
+                )
+                list.add(user)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return list
+    }
 }
