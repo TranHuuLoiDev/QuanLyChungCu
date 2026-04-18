@@ -69,7 +69,8 @@ class AdminBillEditorActivity : AppCompatActivity() {
         spinnerApartment.adapter = adapter
     }
 
-    // 2. CÀI ĐẶT BỘ CHỌN LỊCH
+    // 2. CÀI ĐẶT BỘ CHỌN LỊCH VÀ TỰ ĐỘNG TÍNH THÁNG
+    // ==========================================
     private fun setupDatePickers() {
         val calendar = Calendar.getInstance()
 
@@ -77,6 +78,9 @@ class AdminBillEditorActivity : AppCompatActivity() {
             DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
                 val selectedDate = String.format("%02d/%02d/%d", dayOfMonth, month + 1, year)
                 button.text = selectedDate
+
+                // Cứ mỗi lần chọn xong ngày là gọi hàm tự tính số tháng
+                autoFillMonths()
             }
         }
 
@@ -88,6 +92,41 @@ class AdminBillEditorActivity : AppCompatActivity() {
         btnCheckOutDate.setOnClickListener {
             DatePickerDialog(this, dateSetListener(btnCheckOutDate),
                 calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
+        }
+    }
+
+    // Hàm phụ: Tự động trừ ngày để tính ra số tháng thuê
+    private fun autoFillMonths() {
+        val checkIn = btnCheckInDate.text.toString()
+        val checkOut = btnCheckOutDate.text.toString()
+
+        if (checkIn != "Chọn ngày nhận phòng" && checkOut != "Chọn ngày trả phòng") {
+            val sdf = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+            try {
+                val dIn = sdf.parse(checkIn)
+                val dOut = sdf.parse(checkOut)
+
+                if (dOut.after(dIn)) {
+                    val calIn = Calendar.getInstance().apply { time = dIn }
+                    val calOut = Calendar.getInstance().apply { time = dOut }
+
+                    // Tính chênh lệch tháng
+                    var diffMonths = (calOut.get(Calendar.YEAR) - calIn.get(Calendar.YEAR)) * 12 +
+                            (calOut.get(Calendar.MONTH) - calIn.get(Calendar.MONTH))
+
+                    // Nếu ngày trả nhỏ hơn ngày nhận (VD: 15/4 đến 14/5) -> Chưa đủ 1 tháng tròn
+                    if (calOut.get(Calendar.DAY_OF_MONTH) < calIn.get(Calendar.DAY_OF_MONTH)) {
+                        diffMonths--
+                    }
+
+                    // Tự động điền vào ô Số tháng (nếu >= 1)
+                    if (diffMonths >= 1) {
+                        edtMonths.setText(diffMonths.toString())
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
@@ -148,7 +187,7 @@ class AdminBillEditorActivity : AppCompatActivity() {
         totalAmount = invoice.amount
     }
 
-    // 4. LƯU DỮ LIỆU VÀO DATABASE
+    // 4. LƯU HOẶC CẬP NHẬT DATABASE (CÓ CHECK LOGIC NGÀY THÁNG)
     private fun setupSaveButton() {
         btnSave.setOnClickListener {
             if (roomList.isEmpty()) {
@@ -160,38 +199,74 @@ class AdminBillEditorActivity : AppCompatActivity() {
             val checkIn = btnCheckInDate.text.toString()
             val checkOut = btnCheckOutDate.text.toString()
 
-            // Kiểm tra xem đã chọn ngày chưa
+            // 1. Kiểm tra đã chọn đủ 2 ngày chưa
             if (checkIn == "Chọn ngày nhận phòng" || checkOut == "Chọn ngày trả phòng") {
-                Toast.makeText(this, "Vui lòng chọn đầy đủ ngày!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Vui lòng chọn đầy đủ ngày nhận và trả phòng!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // Tạo tiêu đề và ngày tháng
+            // 2. RÀNG BUỘC LOGIC NGÀY THÁNG
+            val sdf = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+            try {
+                val dIn = sdf.parse(checkIn)
+                val dOut = sdf.parse(checkOut)
+
+                // 2.1: Ngày trả phải sau ngày nhận
+                if (!dOut.after(dIn)) {
+                    Toast.makeText(this, "Ngày trả phòng phải LỚN HƠN ngày nhận phòng!", Toast.LENGTH_LONG).show()
+                    return@setOnClickListener
+                }
+
+                val calIn = Calendar.getInstance().apply { time = dIn }
+                val calOut = Calendar.getInstance().apply { time = dOut }
+
+                var realDiffMonths = (calOut.get(Calendar.YEAR) - calIn.get(Calendar.YEAR)) * 12 +
+                        (calOut.get(Calendar.MONTH) - calIn.get(Calendar.MONTH))
+
+                if (calOut.get(Calendar.DAY_OF_MONTH) < calIn.get(Calendar.DAY_OF_MONTH)) {
+                    realDiffMonths--
+                }
+
+                // 2.2: Thời gian thuê phải tối thiểu 1 tháng tròn
+                if (realDiffMonths < 1) {
+                    Toast.makeText(this, "Thời gian thuê chưa đủ 1 tháng tròn!", Toast.LENGTH_LONG).show()
+                    return@setOnClickListener
+                }
+
+                // 2.3: Số tháng tự nhập vào (edtMonths) phải KHỚP với thực tế
+                val inputMonths = edtMonths.text.toString().toIntOrNull() ?: 0
+                if (inputMonths != realDiffMonths) {
+                    Toast.makeText(this, "Số tháng thuê ($inputMonths) không khớp với thời gian trên lịch ($realDiffMonths tháng)!", Toast.LENGTH_LONG).show()
+                    return@setOnClickListener
+                }
+
+            } catch (e: Exception) {
+                Toast.makeText(this, "Lỗi đọc dữ liệu ngày tháng!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // 3. Tiến hành Lưu (Nếu vượt qua hết các kiểm tra trên)
             val invoiceTitle = "Hóa đơn ($checkIn - $checkOut)"
             val currentDate = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault()).format(java.util.Date())
 
             val isSuccess: Boolean
-
             if (editingInvoice != null) {
-                // --- CHẾ ĐỘ CẬP NHẬT (SỬA HÓA ĐƠN CŨ) ---
                 val updatedInvoice = Invoice(
-                    invoiceId = editingInvoice!!.invoiceId, // Lấy ID của hóa đơn cũ
+                    invoiceId = editingInvoice!!.invoiceId,
                     roomId = selectedRoom,
                     invoiceTitle = invoiceTitle,
                     amount = totalAmount,
                     createdDate = currentDate,
-                    status = editingInvoice!!.status // Giữ nguyên trạng thái thanh toán cũ
+                    status = editingInvoice!!.status
                 )
                 isSuccess = dbHelper.updateFullInvoice(updatedInvoice)
             } else {
-                // --- CHẾ ĐỘ THÊM MỚI ---
                 isSuccess = dbHelper.insertInvoice(selectedRoom, invoiceTitle, totalAmount, currentDate)
             }
 
-            // Kiểm tra kết quả và đóng màn hình
             if (isSuccess) {
                 Toast.makeText(this, "Đã lưu hóa đơn thành công!", Toast.LENGTH_SHORT).show()
-                finish() // Đóng màn hình này và quay lại danh sách
+                finish()
             } else {
                 Toast.makeText(this, "Lỗi khi lưu hóa đơn!", Toast.LENGTH_SHORT).show()
             }
