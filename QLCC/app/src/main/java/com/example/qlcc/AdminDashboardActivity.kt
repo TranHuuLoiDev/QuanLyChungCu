@@ -76,10 +76,12 @@ class AdminDashboardActivity : AppCompatActivity() {
         }
 
         // 8. Cài đặt tạm thời cho các nút còn lại (Để bấm vào không bị lỗi)
-        val btnSendNotices = findViewById<CardView>(R.id.btnSendNotices)
+        val btnSendNotices = findViewById<androidx.cardview.widget.CardView>(R.id.btnSendNotices)
         btnSendNotices.setOnClickListener {
-            val intent = Intent(this, AdminCreateNotiActivity::class.java)
-             startActivity(intent)
+            // Mở trang Danh sách (Lịch sử) thông báo
+            val intent = Intent(this, NotificationActivity::class.java)
+            intent.putExtra("ROLE", "ADMIN")
+            startActivity(intent)
         }
         val btnViewReports = findViewById<CardView>(R.id.btnViewReports)
         btnViewReports.setOnClickListener {

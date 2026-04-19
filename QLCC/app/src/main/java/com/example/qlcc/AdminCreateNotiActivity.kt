@@ -61,21 +61,8 @@ class AdminCreateNotiActivity : AppCompatActivity() {
             val isSuccess = dbHelper.insertNotification(adminId, title, content, type, currentDate)
 
             if (isSuccess) {
-                Toast.makeText(this, "Đã phát thông báo thành công!", Toast.LENGTH_LONG).show()
-
-                // ==========================================
-                // ĐÃ SỬA Ở ĐÂY: CHUYỂN THẲNG VỀ TRANG DANH SÁCH VỚI QUYỀN ADMIN
-                // ==========================================
-                val intent = Intent(this, NotificationActivity::class.java)
-                intent.putExtra("ROLE", "ADMIN")
-
-                // Thêm 2 cờ này để xóa lịch sử trang cũ, tránh bị lỗi khi bấm nút Back của điện thoại
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                startActivity(intent)
-
-                finish() // Đóng trang soạn thảo hiện tại
-            } else {
-                Toast.makeText(this, "Lỗi khi lưu thông báo!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Đã đăng thông báo mới!", Toast.LENGTH_SHORT).show()
+                finish() // Chỉ cần đóng trang này, trang lịch sử phía dưới sẽ tự cập nhật
             }
         }
 
