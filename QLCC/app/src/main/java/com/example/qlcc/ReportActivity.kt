@@ -1,68 +1,83 @@
 package com.example.qlcc
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
+import android.view.View
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class ReportActivity : AppCompatActivity() {
+
+    lateinit var listReports: ListView
+    lateinit var radioStatus: RadioGroup
+    lateinit var tvFilterTitle: TextView
+    lateinit var btnViewReports: Button
+
+    lateinit var adapter: ArrayAdapter<String>
+
+    // ===== DATA GIẢ =====
+    val pendingList = arrayListOf(
+        "Rò rỉ nước - Căn A101",
+        "Hỏng thang máy - Tầng 5"
+    )
+
+    val processingList = arrayListOf(
+        "Sửa điện hành lang - B202"
+    )
+
+    val doneList = arrayListOf(
+        "Dọn rác - C303"
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_report)
+        setContentView(R.layout.activity_reports)
 
-        // 1. Cài đặt Toolbar màu đỏ và nút Back
-        val toolbar = findViewById<Toolbar>(R.id.toolbarReport)
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        val upArrow = ContextCompat.getDrawable(this, android.R.drawable.ic_menu_revert)
-        upArrow?.setTint(ContextCompat.getColor(this, android.R.color.white))
-        supportActionBar?.setHomeAsUpIndicator(upArrow)
-        toolbar.setNavigationOnClickListener { finish() }
+        // ===== ÁNH XẠ =====
+        btnViewReports = findViewById(R.id.btnViewReports)
+        listReports = findViewById(R.id.listReports)
+        radioStatus = findViewById(R.id.radioStatus)
+        tvFilterTitle = findViewById(R.id.tvFilterTitle)
 
-        // 2. NHẬN THÔNG TIN CƯ DÂN (Để biết ai là người gửi phản ánh)
-        @Suppress("DEPRECATION")
-        val currentUser = intent.getSerializableExtra("USER_INFO") as? User
+        // ===== ADAPTER =====
+        adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_list_item_1,
+            ArrayList()
+        )
 
-        // 3. ÁNH XẠ GIAO DIỆN (Đã thêm ô edtTitle)
-        val edtTitle = findViewById<EditText>(R.id.edtReportTitle)
-        val edtContent = findViewById<EditText>(R.id.edtReportContent)
-        val btnSubmit = findViewById<Button>(R.id.btnSubmitReport)
+        listReports.adapter = adapter
 
-        // 4. XỬ LÝ SỰ KIỆN GỬI VÀ LƯU VÀO DATABASE
-        btnSubmit.setOnClickListener {
-            val title = edtTitle.text.toString().trim()
-            val content = edtContent.text.toString().trim()
+        // ===== CLICK BUTTON =====
+        btnViewReports.setOnClickListener {
 
-            // Kiểm tra xem có nhập thiếu không
-            if (title.isEmpty() || content.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập đầy đủ Tiêu đề và Nội dung!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+            tvFilterTitle.visibility = View.VISIBLE
+            radioStatus.visibility = View.VISIBLE
 
-            if (currentUser != null) {
-                // Lấy ngày giờ thực tế hiện tại
-                val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-                val currentDate = sdf.format(Date())
+            Toast.makeText(this, "Chọn trạng thái để xem", Toast.LENGTH_SHORT).show()
+        }
 
-                // Gọi Database để lưu
-                val dbHelper = DatabaseHelper(this)
-                val isSuccess = dbHelper.insertReport(currentUser.userId, title, content, currentDate)
+        // ===== CHỌN TRẠNG THÁI =====
+        radioStatus.setOnCheckedChangeListener { _, checkedId ->
 
-                if (isSuccess) {
-                    Toast.makeText(this, "Đã gửi phản ánh thành công!", Toast.LENGTH_LONG).show()
-                    finish() // Tự động đóng màn hình đỏ, quay về trang Lịch sử
-                } else {
-                    Toast.makeText(this, "Có lỗi xảy ra, không thể gửi!", Toast.LENGTH_SHORT).show()
+            listReports.visibility = View.VISIBLE
+            adapter.clear()
+
+            when (checkedId) {
+
+                R.id.rbPending -> {
+                    adapter.addAll(pendingList)
                 }
-            } else {
-                Toast.makeText(this, "Lỗi: Không tìm thấy thông tin tài khoản!", Toast.LENGTH_SHORT).show()
+
+                R.id.rbProcessing -> {
+                    adapter.addAll(processingList)
+                }
+
+                R.id.rbDone -> {
+                    adapter.addAll(doneList)
+                }
             }
+
+            adapter.notifyDataSetChanged()
         }
     }
 }
