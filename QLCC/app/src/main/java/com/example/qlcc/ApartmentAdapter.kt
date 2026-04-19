@@ -19,6 +19,7 @@ class ApartmentAdapter(
         val tvRoomStatus: TextView = view.findViewById(R.id.tvRoomStatus)
         // Bổ sung thêm dòng ánh xạ này
         val tvRoomDesc: TextView = view.findViewById(R.id.tvRoomDesc)
+        val tvResidentName: TextView = view.findViewById(R.id.tvResidentName)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -36,6 +37,10 @@ class ApartmentAdapter(
         // Gắn dữ liệu mô tả (nếu null thì hiện chữ "Chưa có mô tả")
         holder.tvRoomDesc.text = apt.roomDesc ?: "Chưa có mô tả"
 
+        // 2. HIỂN THỊ TÊN CƯ DÂN THẬT TỪ DATABASE
+        // Nếu trường userFullname trong Database là null, sẽ hiện "Chưa có người ở"
+        holder.tvResidentName.text = "Cư dân: ${apt.userFullname ?: "Chưa có người ở"}"
+
         when (apt.roomStatus) {
             "Trống" -> {
                 holder.tvRoomStatus.setTextColor("#2E7D32".toColorInt())
@@ -45,7 +50,7 @@ class ApartmentAdapter(
                 holder.tvRoomStatus.setTextColor("#1565C0".toColorInt())
                 holder.tvRoomStatus.setBackgroundColor("#E3F2FD".toColorInt())
             }
-            else -> {
+            "Sửa chữa", "Bảo trì" -> { // Thêm dòng này để xử lý màu cam
                 holder.tvRoomStatus.setTextColor("#E65100".toColorInt())
                 holder.tvRoomStatus.setBackgroundColor("#FFF3E0".toColorInt())
             }

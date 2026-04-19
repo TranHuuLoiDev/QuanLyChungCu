@@ -38,6 +38,16 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tvResidentName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Cư dân: ..."
+                android:textColor="#1976D2"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
                 android:id="@+id/tvRoomArea"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

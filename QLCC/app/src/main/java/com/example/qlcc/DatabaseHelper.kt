@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import java.io.File
 import java.io.FileOutputStream
+import android.content.ContentValues
 
 class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "QuanLyCC.db", null, 1) {
 
@@ -125,15 +126,35 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
     fun getAllApartments(): List<Apartment> {
         val list = mutableListOf<Apartment>()
         val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM Apartments ORDER BY room_id ASC", null)
+        val query = """
+        SELECT Apartments.*, Users.user_fullname 
+        FROM Apartments 
+        LEFT JOIN Users ON Apartments.room_id = Users.user_roomID 
+        ORDER BY Apartments.room_id ASC
+    """.trimIndent()
+
+        val cursor = db.rawQuery(query, null)
 
         if (cursor.moveToFirst()) {
             do {
+                val resident = cursor.getString(cursor.getColumnIndexOrThrow("user_fullname"))
+                val dbStatus = cursor.getString(cursor.getColumnIndexOrThrow("room_status"))
+                // logic
+                // 1. Ưu tiên 1: Nếu DB ghi "Sửa chữa" hoặc "Đang bảo trì" -> Phải giữ nguyên để Admin biết.
+                // 2. Ưu tiên 2: Nếu có tên người ở -> Phải hiện "Đang ở".
+                // 3. Ưu tiên 3: Nếu không có người ở -> Hiện theo DB (thường sẽ là "Trống").
+                val finalStatus = when {
+                    dbStatus == "Sửa chữa" || dbStatus == "Đang bảo trì" -> dbStatus
+                    !resident.isNullOrBlank() -> "Đang ở"
+                    else -> dbStatus
+                }
+
                 val apt = Apartment(
                     roomId = cursor.getString(cursor.getColumnIndexOrThrow("room_id")),
-                    roomStatus = cursor.getString(cursor.getColumnIndexOrThrow("room_status")),
+                    roomStatus = finalStatus,
                     roomArea = cursor.getDouble(cursor.getColumnIndexOrThrow("room_area")),
-                    roomDesc = cursor.getString(cursor.getColumnIndexOrThrow("room_desc"))
+                    roomDesc = cursor.getString(cursor.getColumnIndexOrThrow("room_desc")),
+                    userFullname = resident
                 )
                 list.add(apt)
             } while (cursor.moveToNext())
@@ -142,14 +163,30 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         return list
     }
 
+    fun removeUserFromRoom(roomId: String): Boolean {
+        val db = this.writableDatabase
+
+        // 1. Tìm người đang ở phòng này và xóa mã phòng của họ
+        val userValues = android.content.ContentValues().apply {
+            putNull("user_roomID") // Đưa về null
+        }
+        db.update("Users", userValues, "user_roomID = ?", arrayOf(roomId))
+
+        // 2. Cập nhật lại trạng thái phòng thành "Trống"
+        val aptValues = android.content.ContentValues().apply {
+            put("room_status", "Trống")
+        }
+        val result = db.update("Apartments", aptValues, "room_id = ?", arrayOf(roomId))
+
+        return result > 0
+    }
+
     fun updateApartmentStatus(roomId: String, newStatus: String): Boolean {
         val db = this.writableDatabase
-        val values = android.content.ContentValues()
-        values.put("room_status", newStatus)
-
-        val result = db.update("Apartments", values, "room_id = ?", arrayOf(roomId))
-        db.close()
-        return result > 0
+        val values = android.content.ContentValues().apply {
+            put("room_status", newStatus)
+        }
+        return db.update("Apartments", values, "room_id = ?", arrayOf(roomId)) > 0
     }
 
     // ==========================================
@@ -310,6 +347,21 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         val db = this.writableDatabase
         val result = db.delete("Users", "user_id = ?", arrayOf(userId.toString()))
         db.close()
+        return result > 0
+    }
+
+    // --- HÀM GÁN NGƯỜI VÀO PHÒNG ---
+    fun assignUserToRoom(userId: Int, roomId: String): Boolean {
+        val db = this.writableDatabase
+
+        // 1. Gán phòng cho User
+        val v1 = ContentValues().apply { put("user_roomID", roomId) }
+        db.update("Users", v1, "user_id = ?", arrayOf(userId.toString()))
+
+        // 2. CẬP NHẬT TRẠNG THÁI PHÒNG (Quan trọng)
+        val v2 = ContentValues().apply { put("room_status", "Đang ở") }
+        val result = db.update("Apartments", v2, "room_id = ?", arrayOf(roomId))
+
         return result > 0
     }
 

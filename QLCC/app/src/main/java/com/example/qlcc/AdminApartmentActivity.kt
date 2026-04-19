@@ -46,26 +46,52 @@ class AdminApartmentActivity : AppCompatActivity() {
     }
 
     private fun showUpdateStatusDialog(apt: Apartment) {
-        val statuses = arrayOf("Trống", "Đang ở", "Sửa chữa")
+        // Thêm lựa chọn Xóa người ở
+        val options = arrayOf("Trống", "Đang ở", "Sửa chữa", "Gán người ở", "Xóa người ở")
 
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("Cập nhật trạng thái phòng ${apt.roomId}")
+        builder.setTitle("Quản lý phòng ${apt.roomId}")
 
-        builder.setItems(statuses) { _, which ->
-            val newStatus = statuses[which]
-
-            // Gọi hàm cập nhật vào Database
-            val isSuccess = dbHelper.updateApartmentStatus(apt.roomId, newStatus)
-
-            if (isSuccess) {
-                Toast.makeText(this, "Đã đổi trạng thái phòng ${apt.roomId} thành $newStatus", Toast.LENGTH_SHORT).show()
-                loadApartmentList() // Tải lại danh sách để cập nhật giao diện
-            } else {
-                Toast.makeText(this, "Cập nhật thất bại!", Toast.LENGTH_SHORT).show()
+        builder.setItems(options) { _, which ->
+            when (which) {
+                3 -> showSelectUserDialog(apt) // Gán người
+                4 -> { // Xóa người
+                    if (dbHelper.removeUserFromRoom(apt.roomId)) {
+                        Toast.makeText(this, "Đã xóa cư dân khỏi phòng ${apt.roomId}", Toast.LENGTH_SHORT).show()
+                        loadApartmentList()
+                    }
+                }
+                else -> {
+                    val newStatus = options[which]
+                    if (dbHelper.updateApartmentStatus(apt.roomId, newStatus)) {
+                        loadApartmentList()
+                    }
+                }
             }
         }
-
         builder.setNegativeButton("Hủy", null)
         builder.show()
+    }
+
+    private fun showSelectUserDialog(apt: Apartment) {
+        val userList = dbHelper.getAllUsers()
+        if (userList.isEmpty()) {
+            Toast.makeText(this, "Chưa có cư dân nào!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Lấy danh sách tên thật từ Database để hiển thị lên Dialog
+        val names = userList.map { "${it.fullName} (${it.phoneNumber})" }.toTypedArray()
+
+        AlertDialog.Builder(this)
+            .setTitle("Chọn cư dân cho phòng ${apt.roomId}")
+            .setItems(names) { _, which ->
+                val selectedUser = userList[which]
+                if (dbHelper.assignUserToRoom(selectedUser.userId, apt.roomId)) {
+                    Toast.makeText(this, "Đã gán ${selectedUser.fullName} thành công", Toast.LENGTH_SHORT).show()
+                    loadApartmentList() // Load lại để cập nhật tên lên giao diện
+                }
+            }
+            .show()
     }
 }
