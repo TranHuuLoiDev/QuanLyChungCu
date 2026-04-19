@@ -323,6 +323,7 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
          val occupied = cursor.count > 0
          cursor.close()
          return occupied
+    }
     // ==========================================
     // 7. QUẢN LÝ THÔNG BÁO (ADMIN & USER)
     // ==========================================
