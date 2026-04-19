@@ -13,16 +13,12 @@
         <activity android:name=".AdminReportActivity" />
         <activity android:name=".HomeUserActivity" />
         <activity android:name=".AdminDashboardActivity" />
-        <activity android:name=".ResidentActivity" />
-        <activity android:name=".AdminAnnouncementActivity" />
-        <activity android:name=".AdminApartmentActivity" />
-
+        <activity
+            android:name="com.example.qlcc.AdminApartmentActivity"
+            android:exported="false" />
         <activity android:name=".ReportActivity" />
         <activity android:name=".ReportHistoryActivity" />
         <activity android:name=".NotificationActivity" />
-        <activity android:name=".AdminInvoiceActivity" />
-        <activity android:name=".AdminBillEditorActivity" />
-        <activity android:name=".UserInvoiceActivity" />
 
         <activity
             android:name=".LoginActivity"
@@ -32,6 +28,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.example.qlcc.VehicleActivity" />
 
     </application>
 </manifest>
