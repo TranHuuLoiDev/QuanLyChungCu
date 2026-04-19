@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -20,14 +21,26 @@ class ResidentActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // LƯU Ý NHỎ: Lúc nãy file XML bạn gửi tên là activity_admin_manage_users
+        // Nếu bạn đã đổi tên layout thì giữ nguyên dòng này, còn không thì sửa thành R.layout.activity_admin_manage_users nhé!
         setContentView(R.layout.resident_list)
 
+        // ==========================================
+        // THÊM NÚT QUAY VỀ (BACK) Ở ĐÂY
+        // ==========================================
+        val btnBack = findViewById<ImageView>(R.id.btnBack)
+        btnBack.setOnClickListener {
+            finish() // Đóng màn hình này và quay về màn hình trước đó
+        }
+
+        // Khởi tạo các thành phần khác
         dbHelper = DatabaseHelper(this)
         recyclerView = findViewById(R.id.recyclerView)
         btnThem = findViewById(R.id.btnThem)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
-        
+
         loadResidentList()
 
         btnThem.setOnClickListener {
@@ -79,9 +92,9 @@ class ResidentActivity : AppCompatActivity() {
         val edtRoomID = dialogView.findViewById<EditText>(R.id.edtRoomID)
 
         edtUsername.setText(user.userName)
-        edtUsername.isEnabled = false 
-        edtPassword.visibility = View.GONE 
-        
+        edtUsername.isEnabled = false
+        edtPassword.visibility = View.GONE
+
         edtFullName.setText(user.fullName)
         edtPhoneNumber.setText(user.phoneNumber)
         edtRoomID.setText(user.roomID)
@@ -101,7 +114,7 @@ class ResidentActivity : AppCompatActivity() {
                     val success = dbHelper.updateUser(updatedUser)
                     if (success) {
                         Toast.makeText(this, "Cập nhật thành công", Toast.LENGTH_SHORT).show()
-                        loadResidentList() 
+                        loadResidentList()
                     } else {
                         Toast.makeText(this, "Lỗi khi cập nhật", Toast.LENGTH_SHORT).show()
                     }
@@ -114,7 +127,7 @@ class ResidentActivity : AppCompatActivity() {
 
     private fun loadResidentList() {
         val list = dbHelper.getAllUsers()
-        adapter = ResidentAdapter(list, 
+        adapter = ResidentAdapter(list,
             onEditClick = { user ->
                 showEditResidentDialog(user)
             },
@@ -133,7 +146,7 @@ class ResidentActivity : AppCompatActivity() {
             val success = dbHelper.deleteUser(user.userId)
             if (success) {
                 Toast.makeText(this, "Đã xóa cư dân", Toast.LENGTH_SHORT).show()
-                loadResidentList() 
+                loadResidentList()
             } else {
                 Toast.makeText(this, "Lỗi khi xóa cư dân", Toast.LENGTH_SHORT).show()
             }

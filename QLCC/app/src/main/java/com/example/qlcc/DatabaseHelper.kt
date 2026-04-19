@@ -365,4 +365,21 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         db.close()
         return result > 0
     }
+
+    // HÀM CHO ADMIN TẠO THÔNG BÁO MỚI
+    // ==========================================
+    fun insertNotification(adminId: Int, title: String, content: String, type: String, createdAt: String): Boolean {
+        val db = this.writableDatabase
+        val values = android.content.ContentValues()
+
+        values.put("admin_id", adminId)
+        values.put("title", title)
+        values.put("content", content)
+        values.put("type", type)
+        values.put("created_at", createdAt)
+
+        val result = db.insert("Notifications", null, values)
+        db.close()
+        return result != -1L
+    }
 }

@@ -10,11 +10,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.QLCC">
-        <activity android:name=".AdminReportActivity" />
         <activity android:name=".HomeUserActivity" />
         <activity android:name=".AdminDashboardActivity" />
         <activity android:name=".ResidentActivity" />
-        <activity android:name=".AdminAnnouncementActivity" />
         <activity android:name=".AdminApartmentActivity" />
 
         <activity android:name=".ReportActivity" />
@@ -23,6 +21,7 @@
         <activity android:name=".AdminInvoiceActivity" />
         <activity android:name=".AdminBillEditorActivity" />
         <activity android:name=".UserInvoiceActivity" />
+        <activity android:name=".AdminCreateNotiActivity" />
 
         <activity
             android:name=".LoginActivity"
