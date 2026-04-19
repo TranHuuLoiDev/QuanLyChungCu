@@ -315,7 +315,6 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         db.close()
         return result > 0
     }
-​
      // Hàm kiểm tra phòng đã có người ở chưa
      fun isRoomOccupied(roomID: String): Boolean {
          val db = this.readableDatabase
