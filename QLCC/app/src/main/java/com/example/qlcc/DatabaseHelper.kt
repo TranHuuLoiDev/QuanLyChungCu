@@ -126,34 +126,74 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
     // ==========================================
     // 4. QUẢN LÝ CĂN HỘ
     // ==========================================
+    // 1. LẤY DANH SÁCH CĂN HỘ (Liên kết chuẩn với Users)
     fun getAllApartments(): List<Apartment> {
         val list = mutableListOf<Apartment>()
         val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM Apartments ORDER BY room_id ASC", null)
+        val query = """
+        SELECT Apartments.*, Users.user_fullname 
+        FROM Apartments 
+        LEFT JOIN Users ON Apartments.room_id = Users.user_roomID 
+        ORDER BY Apartments.room_id ASC
+    """.trimIndent()
 
+        val cursor = db.rawQuery(query, null)
         if (cursor.moveToFirst()) {
             do {
-                val apt = Apartment(
+                val resident = cursor.getString(cursor.getColumnIndexOrThrow("user_fullname"))
+                val dbStatus = cursor.getString(cursor.getColumnIndexOrThrow("room_status"))
+
+                // LOGIC LIÊN KẾT: Ưu tiên Bảo trì/Sửa chữa > Có người ở > Trống
+                val finalStatus = when {
+                    dbStatus == "Sửa chữa" || dbStatus == "Bảo trì" -> dbStatus
+                    !resident.isNullOrBlank() -> "Đang ở"
+                    else -> "Trống"
+                }
+
+                list.add(Apartment(
                     roomId = cursor.getString(cursor.getColumnIndexOrThrow("room_id")),
-                    roomStatus = cursor.getString(cursor.getColumnIndexOrThrow("room_status")),
+                    roomStatus = finalStatus,
                     roomArea = cursor.getDouble(cursor.getColumnIndexOrThrow("room_area")),
-                    roomDesc = cursor.getString(cursor.getColumnIndexOrThrow("room_desc"))
-                )
-                list.add(apt)
+                    roomDesc = cursor.getString(cursor.getColumnIndexOrThrow("room_desc")),
+                    userFullname = resident
+                ))
             } while (cursor.moveToNext())
         }
         cursor.close()
         return list
     }
 
+    // 2. HÀM XÓA NGƯỜI Ở
+    fun removeUserFromRoom(roomId: String): Boolean {
+        val db = this.writableDatabase
+        return try {
+            // 1. Tìm người đang ở phòng này và xóa mã phòng của họ
+            val userValues = android.content.ContentValues().apply {
+                putNull("user_roomID")
+            }
+            db.update("Users", userValues, "user_roomID = ?", arrayOf(roomId))
+
+            // 2. Cập nhật lại trạng thái phòng thành "Trống"
+            val aptValues = android.content.ContentValues().apply {
+                put("room_status", "Trống")
+            }
+            val result = db.update("Apartments", aptValues, "room_id = ?", arrayOf(roomId))
+
+            // KHÔNG gọi db.close() ở đây
+            result > 0
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    // 3. HÀM CẬP NHẬT TRẠNG THÁI (Cho các nút Trống/Sửa chữa)
     fun updateApartmentStatus(roomId: String, newStatus: String): Boolean {
         val db = this.writableDatabase
-        val values = android.content.ContentValues()
-        values.put("room_status", newStatus)
-
-        val result = db.update("Apartments", values, "room_id = ?", arrayOf(roomId))
-        db.close()
-        return result > 0
+        val values = android.content.ContentValues().apply {
+            put("room_status", newStatus)
+        }
+        return db.update("Apartments", values, "room_id = ?", arrayOf(roomId)) > 0
     }
 
     // ==========================================

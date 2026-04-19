@@ -46,18 +46,17 @@ class AdminApartmentActivity : AppCompatActivity() {
     }
 
     private fun showUpdateStatusDialog(apt: Apartment) {
-        // Thêm lựa chọn Xóa người ở
+        // 5 lựa chọn chuẩn
         val options = arrayOf("Trống", "Đang ở", "Sửa chữa", "Gán người ở", "Xóa người ở")
 
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Quản lý phòng ${apt.roomId}")
-
         builder.setItems(options) { _, which ->
             when (which) {
                 3 -> showSelectUserDialog(apt) // Gán người
-                4 -> { // Xóa người
+                4 -> { // Xóa người (Dòng này sẽ hết lỗi đỏ)
                     if (dbHelper.removeUserFromRoom(apt.roomId)) {
-                        Toast.makeText(this, "Đã xóa cư dân khỏi phòng ${apt.roomId}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Đã xóa cư dân", Toast.LENGTH_SHORT).show()
                         loadApartmentList()
                     }
                 }
@@ -69,7 +68,6 @@ class AdminApartmentActivity : AppCompatActivity() {
                 }
             }
         }
-        builder.setNegativeButton("Hủy", null)
         builder.show()
     }
 
