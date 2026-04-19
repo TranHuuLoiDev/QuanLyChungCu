@@ -26,7 +26,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Họ và tên"
-        android:inputType="textPersonName"/>
+        android:inputType="textPersonName"
+        android:minHeight="48dp"/>
+
+    <EditText
+        android:id="@+id/edtPhoneNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Số điện thoại"
+        android:inputType="phone"
+        android:minHeight="48dp"/>
 
     <TextView
         android:layout_width="match_parent"
