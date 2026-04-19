@@ -140,7 +140,7 @@ class ResidentActivity : AppCompatActivity() {
                     Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show()
                 } else {
                     if (roomID != user.roomID && dbHelper.isRoomOccupied(roomID)) {
-                        Toast.makeText(this, "Phòng mới này đã có người ở!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Phòng này đã có người ở", Toast.LENGTH_SHORT).show()
                     } else {
                         val updatedUser = User(user.userId, user.userName, fullName, phone, roomID)
                         val success = dbHelper.updateUser(updatedUser)
