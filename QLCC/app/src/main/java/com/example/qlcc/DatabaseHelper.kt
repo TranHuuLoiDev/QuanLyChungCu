@@ -6,6 +6,9 @@ import android.database.sqlite.SQLiteOpenHelper
 import java.io.File
 import java.io.FileOutputStream
 import android.content.ContentValues
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "QuanLyCC.db", null, 1) {
 
@@ -126,35 +129,15 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
     fun getAllApartments(): List<Apartment> {
         val list = mutableListOf<Apartment>()
         val db = this.readableDatabase
-        val query = """
-        SELECT Apartments.*, Users.user_fullname 
-        FROM Apartments 
-        LEFT JOIN Users ON Apartments.room_id = Users.user_roomID 
-        ORDER BY Apartments.room_id ASC
-    """.trimIndent()
-
-        val cursor = db.rawQuery(query, null)
+        val cursor = db.rawQuery("SELECT * FROM Apartments ORDER BY room_id ASC", null)
 
         if (cursor.moveToFirst()) {
             do {
-                val resident = cursor.getString(cursor.getColumnIndexOrThrow("user_fullname"))
-                val dbStatus = cursor.getString(cursor.getColumnIndexOrThrow("room_status"))
-                // logic
-                // 1. Ưu tiên 1: Nếu DB ghi "Sửa chữa" hoặc "Đang bảo trì" -> Phải giữ nguyên để Admin biết.
-                // 2. Ưu tiên 2: Nếu có tên người ở -> Phải hiện "Đang ở".
-                // 3. Ưu tiên 3: Nếu không có người ở -> Hiện theo DB (thường sẽ là "Trống").
-                val finalStatus = when {
-                    dbStatus == "Sửa chữa" || dbStatus == "Đang bảo trì" -> dbStatus
-                    !resident.isNullOrBlank() -> "Đang ở"
-                    else -> dbStatus
-                }
-
                 val apt = Apartment(
                     roomId = cursor.getString(cursor.getColumnIndexOrThrow("room_id")),
-                    roomStatus = finalStatus,
+                    roomStatus = cursor.getString(cursor.getColumnIndexOrThrow("room_status")),
                     roomArea = cursor.getDouble(cursor.getColumnIndexOrThrow("room_area")),
-                    roomDesc = cursor.getString(cursor.getColumnIndexOrThrow("room_desc")),
-                    userFullname = resident
+                    roomDesc = cursor.getString(cursor.getColumnIndexOrThrow("room_desc"))
                 )
                 list.add(apt)
             } while (cursor.moveToNext())
@@ -163,30 +146,14 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         return list
     }
 
-    fun removeUserFromRoom(roomId: String): Boolean {
-        val db = this.writableDatabase
-
-        // 1. Tìm người đang ở phòng này và xóa mã phòng của họ
-        val userValues = android.content.ContentValues().apply {
-            putNull("user_roomID") // Đưa về null
-        }
-        db.update("Users", userValues, "user_roomID = ?", arrayOf(roomId))
-
-        // 2. Cập nhật lại trạng thái phòng thành "Trống"
-        val aptValues = android.content.ContentValues().apply {
-            put("room_status", "Trống")
-        }
-        val result = db.update("Apartments", aptValues, "room_id = ?", arrayOf(roomId))
-
-        return result > 0
-    }
-
     fun updateApartmentStatus(roomId: String, newStatus: String): Boolean {
         val db = this.writableDatabase
-        val values = android.content.ContentValues().apply {
-            put("room_status", newStatus)
-        }
-        return db.update("Apartments", values, "room_id = ?", arrayOf(roomId)) > 0
+        val values = android.content.ContentValues()
+        values.put("room_status", newStatus)
+
+        val result = db.update("Apartments", values, "room_id = ?", arrayOf(roomId))
+        db.close()
+        return result > 0
     }
 
     // ==========================================
@@ -365,6 +332,14 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         return result > 0
     }
 
+     // Hàm kiểm tra phòng đã có người ở chưa
+     fun isRoomOccupied(roomID: String): Boolean {
+         val db = this.readableDatabase
+         val cursor = db.rawQuery("SELECT 1 FROM Users WHERE user_roomID = ?", arrayOf(roomID))
+         val occupied = cursor.count > 0
+         cursor.close()
+         return occupied
+    }
     // ==========================================
     // 7. QUẢN LÝ THÔNG BÁO (ADMIN & USER)
     // ==========================================

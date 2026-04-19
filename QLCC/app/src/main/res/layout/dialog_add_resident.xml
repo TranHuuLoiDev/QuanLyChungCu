@@ -10,34 +10,46 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Tên đăng nhập"
-        android:inputType="text"/>
+        android:inputType="text"
+        android:minHeight="48dp"/>
 
     <EditText
         android:id="@+id/edtPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Mật khẩu"
-        android:inputType="textPassword"/>
+        android:inputType="textPassword"
+        android:minHeight="48dp"/>
 
     <EditText
         android:id="@+id/edtFullName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Họ và tên"
-        android:inputType="textPersonName"/>
+        android:inputType="textPersonName"
+        android:minHeight="48dp"/>
 
     <EditText
         android:id="@+id/edtPhoneNumber"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Số điện thoại"
-        android:inputType="phone"/>
+        android:inputType="phone"
+        android:minHeight="48dp"/>
 
-    <EditText
-        android:id="@+id/edtRoomID"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Số phòng "
-        android:inputType="text"/>
+        android:text="Chọn phòng:"
+        android:layout_marginTop="10dp"
+        android:textSize="14sp"
+        android:textColor="#757575"/>
+
+    <Spinner
+        android:id="@+id/spnRoomID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:minHeight="48dp"/>
 
 </LinearLayout>
