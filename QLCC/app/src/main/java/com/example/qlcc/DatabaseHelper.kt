@@ -5,6 +5,9 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import java.io.File
 import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "QuanLyCC.db", null, 1) {
 
@@ -312,7 +315,14 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         db.close()
         return result > 0
     }
-
+​
+     // Hàm kiểm tra phòng đã có người ở chưa
+     fun isRoomOccupied(roomID: String): Boolean {
+         val db = this.readableDatabase
+         val cursor = db.rawQuery("SELECT 1 FROM Users WHERE user_roomID = ?", arrayOf(roomID))
+         val occupied = cursor.count > 0
+         cursor.close()
+         return occupied
     // ==========================================
     // 7. QUẢN LÝ THÔNG BÁO (ADMIN & USER)
     // ==========================================
