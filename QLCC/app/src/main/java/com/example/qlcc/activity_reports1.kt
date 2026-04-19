@@ -16,7 +16,7 @@ class ReportActivity1 : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_reports)
+        setContentView(R.layout.activity_report)
 
         // 1. Ánh xạ các View từ XML (activity_reports.xml)
         btnViewReports = findViewById(R.id.btnViewReports)

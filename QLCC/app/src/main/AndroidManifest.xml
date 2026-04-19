@@ -10,15 +10,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.QLCC">
-        <activity android:name=".AdminReportActivity" />
         <activity android:name=".HomeUserActivity" />
         <activity android:name=".AdminDashboardActivity" />
+        <activity android:name=".ResidentActivity" />
+        <activity android:name=".AdminAnnouncementActivity" />
         <activity
-            android:name="com.example.qlcc.AdminApartmentActivity"
+            android:name=".AdminApartmentActivity"
             android:exported="false" />
         <activity android:name=".ReportActivity" />
         <activity android:name=".ReportHistoryActivity" />
         <activity android:name=".NotificationActivity" />
+        <activity android:name=".AdminInvoiceActivity" />
+        <activity android:name=".AdminBillEditorActivity" />
+        <activity android:name=".UserInvoiceActivity" />
 
         <activity
             android:name=".LoginActivity"

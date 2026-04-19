@@ -30,7 +30,7 @@ class ReportActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_reports)
+        setContentView(R.layout.activity_report)
 
         // ===== ÁNH XẠ =====
         btnViewReports = findViewById(R.id.btnViewReports)
