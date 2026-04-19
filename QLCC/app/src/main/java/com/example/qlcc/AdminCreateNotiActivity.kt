@@ -1,5 +1,6 @@
 package com.example.qlcc
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -50,7 +51,7 @@ class AdminCreateNotiActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Tự động lấy ngày giờ hiện tại theo format y hệt trong Database (VD: 2026-04-13 08:00)
+            // Tự động lấy ngày giờ hiện tại theo format y hệt trong Database (VD: 2026-04-19 20:47)
             val currentDate = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
 
             // Tạm thời gán admin_id = 1. (Sau này nếu có nhiều admin thì bạn truyền từ Login sang)
@@ -61,10 +62,22 @@ class AdminCreateNotiActivity : AppCompatActivity() {
 
             if (isSuccess) {
                 Toast.makeText(this, "Đã phát thông báo thành công!", Toast.LENGTH_LONG).show()
-                finish() // Đóng trang soạn thảo
+
+                // ==========================================
+                // ĐÃ SỬA Ở ĐÂY: CHUYỂN THẲNG VỀ TRANG DANH SÁCH VỚI QUYỀN ADMIN
+                // ==========================================
+                val intent = Intent(this, NotificationActivity::class.java)
+                intent.putExtra("ROLE", "ADMIN")
+
+                // Thêm 2 cờ này để xóa lịch sử trang cũ, tránh bị lỗi khi bấm nút Back của điện thoại
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                startActivity(intent)
+
+                finish() // Đóng trang soạn thảo hiện tại
             } else {
                 Toast.makeText(this, "Lỗi khi lưu thông báo!", Toast.LENGTH_SHORT).show()
             }
         }
+
     }
 }
