@@ -155,7 +155,7 @@ class AdminBillEditorActivity : AppCompatActivity() {
         // 1. Lấy dữ liệu từ các ô nhập (nếu bỏ trống thì tính là 0)
         val electric = edtElectric.text.toString().toDoubleOrNull() ?: 0.0
         val water = edtWater.text.toString().toDoubleOrNull() ?: 0.0
-        val parking = edtRent.text.toString().toDoubleOrNull() ?: 0.0 // Đây là tiền gửi xe
+        val parking = edtRent.text.toString().toDoubleOrNull() ?: 0.0
 
         // Mặc định nếu chưa nhập số tháng thì tính là 1 tháng
         val months = edtMonths.text.toString().toDoubleOrNull() ?: 1.0
@@ -176,9 +176,8 @@ class AdminBillEditorActivity : AppCompatActivity() {
         // 1. Đổi tiêu đề nút và text
         btnSave.text = "Cập nhật thay đổi"
 
-        // 2. Điền số tiền (Tạm thời chia ngược lại hoặc điền trực tiếp tùy logic của bạn)
-        // Ở đây mình ví dụ điền thẳng vào các ô:
-        edtElectric.setText("0") // Vì Database không lưu tách lẻ nên bạn có thể nhập lại
+        // 2. Điền số tiền (Tạm thời chia ngược lại hoặc điền trực tiếp)
+        edtElectric.setText("0")
         edtMonths.setText("1")
 
         // 3. Hiển thị tổng tiền cũ
@@ -245,7 +244,7 @@ class AdminBillEditorActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // 3. Tiến hành Lưu (Nếu vượt qua hết các kiểm tra trên)
+            // 3. Tiến hành Lưu
             val invoiceTitle = "Hóa đơn ($checkIn - $checkOut)"
             val currentDate = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault()).format(java.util.Date())
 

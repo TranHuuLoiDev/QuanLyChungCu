@@ -54,7 +54,7 @@ class AdminApartmentActivity : AppCompatActivity() {
         builder.setItems(options) { _, which ->
             when (which) {
                 3 -> showSelectUserDialog(apt) // Gán người
-                4 -> { // Xóa người (Dòng này sẽ hết lỗi đỏ)
+                4 -> { // Xóa người
                     if (dbHelper.removeUserFromRoom(apt.roomId)) {
                         Toast.makeText(this, "Đã xóa cư dân", Toast.LENGTH_SHORT).show()
                         loadApartmentList()

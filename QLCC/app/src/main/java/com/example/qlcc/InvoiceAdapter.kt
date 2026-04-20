@@ -48,7 +48,6 @@ class InvoiceAdapter(
             holder.tvStatus.setBackgroundColor(Color.parseColor("#FFEBEE"))
         }
 
-        // Bắt sự kiện click
         holder.itemView.setOnClickListener {
             onInvoiceClick(invoice)
         }

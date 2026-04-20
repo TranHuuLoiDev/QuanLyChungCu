@@ -50,7 +50,7 @@ class ApartmentAdapter(
                 holder.tvRoomStatus.setTextColor("#1565C0".toColorInt())
                 holder.tvRoomStatus.setBackgroundColor("#E3F2FD".toColorInt())
             }
-            "Sửa chữa", "Bảo trì" -> { // Thêm dòng này để xử lý màu cam
+            "Sửa chữa", "Bảo trì" -> {
                 holder.tvRoomStatus.setTextColor("#E65100".toColorInt())
                 holder.tvRoomStatus.setBackgroundColor("#FFF3E0".toColorInt())
             }

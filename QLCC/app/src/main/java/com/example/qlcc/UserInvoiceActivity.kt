@@ -17,7 +17,7 @@ class UserInvoiceActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_invoice)
 
-        // 1. Cài đặt Toolbar (Có nút Back)
+        // 1.Toolbar (Có nút Back)
         val toolbar = findViewById<Toolbar>(R.id.toolbarUserInvoice)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

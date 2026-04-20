@@ -39,7 +39,6 @@ class AdminInvoiceActivity : AppCompatActivity() {
         // Bắt sự kiện khi ấn vào nút Dấu Cộng tròn ở góc
         val fabAddInvoice = findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabAddInvoice)
         fabAddInvoice.setOnClickListener {
-            // Nhớ đổi tên AdminBillEditorActivity thành ĐÚNG TÊN file Kotlin của bạn nhé
             val intent = Intent(this, AdminBillEditorActivity::class.java)
             startActivity(intent)
         }
@@ -65,7 +64,7 @@ class AdminInvoiceActivity : AppCompatActivity() {
                         startActivity(intent)
                     }
                     2 -> {
-                        // Viết code xử lý Xóa ở đây
+                        //code xử lý Xóa
                         confirmDelete(selectedInvoice)
                     }
                 }
@@ -84,7 +83,7 @@ class AdminInvoiceActivity : AppCompatActivity() {
                 val isDeleted = dbHelper.deleteInvoice(invoice.invoiceId)
                 if (isDeleted) {
                     Toast.makeText(this, "Đã xóa hóa đơn", Toast.LENGTH_SHORT).show()
-                    loadInvoiceList() // Quan trọng: Phải gọi lại hàm này để cập nhật lại danh sách trên màn hình
+                    loadInvoiceList() // gọi lại hàm này để cập nhật lại danh sách trên màn hình
                 }
             }
             .setNegativeButton("Hủy", null)
