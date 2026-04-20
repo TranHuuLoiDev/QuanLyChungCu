@@ -5,10 +5,6 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import java.io.File
 import java.io.FileOutputStream
-import android.content.ContentValues
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "QuanLyCC.db", null, 1) {
 
@@ -63,7 +59,7 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
     }
 
     // ==========================================
-    // 2. Hàm kiểm tra Đăng nhập cho ADMIN
+    // 2. Hàm kiểm tra Đăng nhập cho ADMIN (Đứng ngang hàng)
     // ==========================================
     fun checkAdminLogin(username: String, pass: String): Admin? {
         val db = this.readableDatabase
@@ -85,7 +81,7 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
     }
 
     // ==========================================
-    // 3. QUẢN LÝ PHẢN ÁNH
+    // 3. Hàm lấy danh sách phản ánh của một Cư dân
     // ==========================================
     fun getReportsByUserId(userId: Int): List<Report> {
         val reportList = mutableListOf<Report>()
@@ -109,95 +105,86 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         return reportList
     }
 
+    // ==========================================
+    // 4. HÀM MỚI: Thêm phản ánh vào Database
+    // ==========================================
     fun insertReport(userId: Int, title: String, content: String, date: String): Boolean {
         val db = this.writableDatabase
         val values = android.content.ContentValues()
+
         values.put("user_id", userId)
         values.put("title", title)
         values.put("content", content)
         values.put("created_date", date)
         values.put("status", "Chờ xử lý")
 
+        // insert trả về -1 nếu bị lỗi
         val result = db.insert("Reports", null, values)
         db.close()
         return result != -1L
     }
 
-    // ==========================================
-    // 4. QUẢN LÝ CĂN HỘ
-    // ==========================================
-    // 1. LẤY DANH SÁCH CĂN HỘ (Liên kết chuẩn với Users)
-    fun getAllApartments(): List<Apartment> {
-        val list = mutableListOf<Apartment>()
+    // Lấy tất cả thông báo
+    fun getAllNotifications(): List<NotificationModel> {
+        val list = mutableListOf<NotificationModel>()
         val db = this.readableDatabase
-        val query = """
-        SELECT Apartments.*, Users.user_fullname 
-        FROM Apartments 
-        LEFT JOIN Users ON Apartments.room_id = Users.user_roomID 
-        ORDER BY Apartments.room_id ASC
-    """.trimIndent()
+        // Giả sử bảng của bạn tên là Notifications (nếu tên khác bạn tự đổi lại nhé)
+        val cursor = db.rawQuery("SELECT * FROM Notifications ORDER BY notify_id DESC", null)
 
-        val cursor = db.rawQuery(query, null)
         if (cursor.moveToFirst()) {
             do {
-                val resident = cursor.getString(cursor.getColumnIndexOrThrow("user_fullname"))
-                val dbStatus = cursor.getString(cursor.getColumnIndexOrThrow("room_status"))
-
-                // LOGIC LIÊN KẾT: Ưu tiên Bảo trì/Sửa chữa > Có người ở > Trống
-                val finalStatus = when {
-                    dbStatus == "Sửa chữa" || dbStatus == "Bảo trì" -> dbStatus
-                    !resident.isNullOrBlank() -> "Đang ở"
-                    else -> "Trống"
-                }
-
-                list.add(Apartment(
-                    roomId = cursor.getString(cursor.getColumnIndexOrThrow("room_id")),
-                    roomStatus = finalStatus,
-                    roomArea = cursor.getDouble(cursor.getColumnIndexOrThrow("room_area")),
-                    roomDesc = cursor.getString(cursor.getColumnIndexOrThrow("room_desc")),
-                    userFullname = resident
-                ))
+                val noti = NotificationModel(
+                    notifyId = cursor.getInt(cursor.getColumnIndexOrThrow("notify_id")),
+                    title = cursor.getString(cursor.getColumnIndexOrThrow("title")),
+                    content = cursor.getString(cursor.getColumnIndexOrThrow("content")),
+                    type = cursor.getString(cursor.getColumnIndexOrThrow("type")),
+                    createdAt = cursor.getString(cursor.getColumnIndexOrThrow("created_at"))
+                )
+                list.add(noti)
             } while (cursor.moveToNext())
         }
         cursor.close()
         return list
     }
 
-    // 2. HÀM XÓA NGƯỜI Ở
-    fun removeUserFromRoom(roomId: String): Boolean {
-        val db = this.writableDatabase
-        return try {
-            // 1. Tìm người đang ở phòng này và xóa mã phòng của họ
-            val userValues = android.content.ContentValues().apply {
-                putNull("user_roomID")
-            }
-            db.update("Users", userValues, "user_roomID = ?", arrayOf(roomId))
+    // ==========================================
+    // Hàm lấy danh sách tất cả căn hộ cho ADMIN
+    // ==========================================
+    fun getAllApartments(): List<Apartment> {
+        val list = mutableListOf<Apartment>()
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM Apartments ORDER BY room_id ASC", null)
 
-            // 2. Cập nhật lại trạng thái phòng thành "Trống"
-            val aptValues = android.content.ContentValues().apply {
-                put("room_status", "Trống")
-            }
-            val result = db.update("Apartments", aptValues, "room_id = ?", arrayOf(roomId))
-
-            // KHÔNG gọi db.close() ở đây
-            result > 0
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
+        if (cursor.moveToFirst()) {
+            do {
+                val apt = Apartment(
+                    roomId = cursor.getString(cursor.getColumnIndexOrThrow("room_id")),
+                    roomStatus = cursor.getString(cursor.getColumnIndexOrThrow("room_status")),
+                    roomArea = cursor.getDouble(cursor.getColumnIndexOrThrow("room_area")),
+                    roomDesc = cursor.getString(cursor.getColumnIndexOrThrow("room_desc"))
+                )
+                list.add(apt)
+            } while (cursor.moveToNext())
         }
-    }
-
-    // 3. HÀM CẬP NHẬT TRẠNG THÁI (Cho các nút Trống/Sửa chữa)
-    fun updateApartmentStatus(roomId: String, newStatus: String): Boolean {
-        val db = this.writableDatabase
-        val values = android.content.ContentValues().apply {
-            put("room_status", newStatus)
-        }
-        return db.update("Apartments", values, "room_id = ?", arrayOf(roomId)) > 0
+        cursor.close()
+        return list
     }
 
     // ==========================================
-    // 5. QUẢN LÝ HÓA ĐƠN
+    // Hàm để ADMIN cập nhật trạng thái căn hộ
+    // ==========================================
+    fun updateApartmentStatus(roomId: String, newStatus: String): Boolean {
+        val db = this.writableDatabase
+        val values = android.content.ContentValues()
+        values.put("room_status", newStatus) // Update đúng vào cột room_status
+
+        // Cập nhật dòng có room_id tương ứng
+        val result = db.update("Apartments", values, "room_id = ?", arrayOf(roomId))
+        db.close()
+        return result > 0 // Trả về true nếu cập nhật thành công
+    }
+
+    // Hàm lấy danh sách tất cả Hóa đơn cho ADMIN
     // ==========================================
     fun getAllInvoices(): List<Invoice> {
         val list = mutableListOf<Invoice>()
@@ -221,6 +208,8 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         return list
     }
 
+    // Hàm tạo Hóa đơn mới
+    // ==========================================
     fun insertInvoice(roomId: String, title: String, amount: Double, createdDate: String): Boolean {
         val db = this.writableDatabase
         val values = android.content.ContentValues()
@@ -228,13 +217,14 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         values.put("invoice_title", title)
         values.put("amount", amount)
         values.put("created_date", createdDate)
-        values.put("status", "Chưa thanh toán")
+        values.put("status", "Chưa thanh toán") // Mặc định khi mới tạo là chưa thanh toán
 
         val result = db.insert("Invoices", null, values)
         db.close()
-        return result != -1L
+        return result != -1L // Trả về true nếu lưu thành công
     }
 
+    // Hàm để ADMIN cập nhật trạng thái Hóa đơn
     fun updateInvoiceStatus(invoiceId: Int, newStatus: String): Boolean {
         val db = this.writableDatabase
         val values = android.content.ContentValues()
@@ -245,6 +235,7 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         return result > 0
     }
 
+    // Hàm cập nhật toàn bộ thông tin hóa đơn (Dùng khi chỉnh sửa chi tiết)
     fun updateFullInvoice(invoice: Invoice): Boolean {
         val db = this.writableDatabase
         val values = android.content.ContentValues()
@@ -259,6 +250,7 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         return result > 0
     }
 
+    // Hàm xóa hóa đơn theo ID
     fun deleteInvoice(invoiceId: Int): Boolean {
         val db = this.writableDatabase
         val result = db.delete("Invoices", "invoice_id = ?", arrayOf(invoiceId.toString()))
@@ -266,9 +258,14 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         return result > 0
     }
 
+
+    // ==========================================
+    // Hàm lấy danh sách Hóa đơn cho USER (Theo mã phòng)
+    // ==========================================
     fun getInvoicesByRoom(roomId: String): List<Invoice> {
         val list = mutableListOf<Invoice>()
         val db = this.readableDatabase
+        // Chỉ lấy hóa đơn có mã phòng khớp với tham số truyền vào
         val cursor = db.rawQuery("SELECT * FROM Invoices WHERE room_id = ? ORDER BY invoice_id DESC", arrayOf(roomId))
 
         if (cursor.moveToFirst()) {
@@ -288,9 +285,13 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         return list
     }
 
+    // ==========================================
+    // Hàm đếm số Hóa đơn CHƯA THANH TOÁN của 1 phòng
+    // ==========================================
     fun getUnpaidInvoiceCount(roomId: String): Int {
         val db = this.readableDatabase
         var count = 0
+        // Đếm số dòng thỏa mãn 2 điều kiện: đúng phòng đó VÀ trạng thái là chưa thanh toán
         val cursor = db.rawQuery("SELECT COUNT(*) FROM Invoices WHERE room_id = ? AND status = 'Chưa thanh toán'", arrayOf(roomId))
 
         if (cursor.moveToFirst()) {
@@ -301,7 +302,7 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
     }
 
     // ==========================================
-    // 6. QUẢN LÝ CƯ DÂN
+    // Hàm lấy danh sách tất cả CƯ DÂN 
     // ==========================================
     fun getAllUsers(): List<User> {
         val list = mutableListOf<User>()
@@ -323,7 +324,9 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         cursor.close()
         return list
     }
-
+// ==========================================
+    // Hàm THÊM CƯ DÂN MỚI
+    // ==========================================
     fun insertUser(userName: String, pass: String, fullName: String, phone: String, roomID: String): Boolean {
         val db = this.writableDatabase
         val values = android.content.ContentValues()
@@ -338,6 +341,9 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         return result != -1L
     }
 
+    // ==========================================
+    // Hàm cập nhật CƯ DÂN
+    // ==========================================
     fun updateUser(user: User): Boolean {
         val db = this.writableDatabase
         val values = android.content.ContentValues()
@@ -350,6 +356,9 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         return result > 0
     }
 
+    // ==========================================
+    // Hàm xóa CƯ DÂN
+    // ==========================================
     fun deleteUser(userId: Int): Boolean {
         val db = this.writableDatabase
         val result = db.delete("Users", "user_id = ?", arrayOf(userId.toString()))
@@ -357,78 +366,12 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         return result > 0
     }
 
-    // --- HÀM GÁN NGƯỜI VÀO PHÒNG ---
-    fun assignUserToRoom(userId: Int, roomId: String): Boolean {
-        val db = this.writableDatabase
-
-        // 1. Gán phòng cho User
-        val v1 = ContentValues().apply { put("user_roomID", roomId) }
-        db.update("Users", v1, "user_id = ?", arrayOf(userId.toString()))
-
-        // 2. CẬP NHẬT TRẠNG THÁI PHÒNG (Quan trọng)
-        val v2 = ContentValues().apply { put("room_status", "Đang ở") }
-        val result = db.update("Apartments", v2, "room_id = ?", arrayOf(roomId))
-
-        return result > 0
-    }
-
-     // Hàm kiểm tra phòng đã có người ở chưa
-     fun isRoomOccupied(roomID: String): Boolean {
-         val db = this.readableDatabase
-         val cursor = db.rawQuery("SELECT 1 FROM Users WHERE user_roomID = ?", arrayOf(roomID))
-         val occupied = cursor.count > 0
-         cursor.close()
-         return occupied
-    }
+    // HÀM CHO ADMIN TẠO THÔNG BÁO MỚI
     // ==========================================
-    // 7. QUẢN LÝ THÔNG BÁO (ADMIN & USER)
-    // ==========================================
-
-    // Lấy tất cả thông báo (Cho màn hình Danh sách)
-    fun getAllNotifications(): List<NotificationModel> {
-        val list = mutableListOf<NotificationModel>()
-        val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM Notifications ORDER BY notify_id DESC", null)
-
-        if (cursor.moveToFirst()) {
-            do {
-                val noti = NotificationModel(
-                    notifyId = cursor.getInt(cursor.getColumnIndexOrThrow("notify_id")),
-                    title = cursor.getString(cursor.getColumnIndexOrThrow("title")),
-                    content = cursor.getString(cursor.getColumnIndexOrThrow("content")),
-                    type = cursor.getString(cursor.getColumnIndexOrThrow("type")),
-                    createdAt = cursor.getString(cursor.getColumnIndexOrThrow("created_at"))
-                )
-                list.add(noti)
-            } while (cursor.moveToNext())
-        }
-        cursor.close()
-        return list
-    }
-
-    // Lấy 1 thông báo mới nhất (Cho trang chủ của User)
-    fun getLatestNotification(): NotificationModel? {
-        val db = this.readableDatabase
-        var notification: NotificationModel? = null
-        val cursor = db.rawQuery("SELECT * FROM Notifications ORDER BY notify_id DESC LIMIT 1", null)
-
-        if (cursor.moveToFirst()) {
-            notification = NotificationModel(
-                notifyId = cursor.getInt(cursor.getColumnIndexOrThrow("notify_id")),
-                title = cursor.getString(cursor.getColumnIndexOrThrow("title")),
-                content = cursor.getString(cursor.getColumnIndexOrThrow("content")),
-                type = cursor.getString(cursor.getColumnIndexOrThrow("type")),
-                createdAt = cursor.getString(cursor.getColumnIndexOrThrow("created_at"))
-            )
-        }
-        cursor.close()
-        return notification
-    }
-
-    // Admin tạo thông báo mới
     fun insertNotification(adminId: Int, title: String, content: String, type: String, createdAt: String): Boolean {
         val db = this.writableDatabase
         val values = android.content.ContentValues()
+
         values.put("admin_id", adminId)
         values.put("title", title)
         values.put("content", content)
@@ -439,25 +382,124 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, "
         db.close()
         return result != -1L
     }
+    // ==========================================
+    // Hàm cập nhật trạng thái Phản ánh (Dùng cho Admin hoặc khi User xem chi tiết)
+    // ==========================================
+    fun updateReportStatus(reportId: Int, newStatus: String): Boolean {
+        val db = this.writableDatabase
+        val values = android.content.ContentValues()
+        values.put("status", newStatus) // Cập nhật cột status thành "Đã xử lý"
 
-    // Admin sửa thông báo
-    fun updateNotification(notifyId: Int, title: String, content: String, type: String): Boolean {
+        // Cập nhật đúng dòng có report_id tương ứng
+        val result = db.update("Reports", values, "report_id = ?", arrayOf(reportId.toString()))
+        db.close()
+        return result > 0 // Trả về true nếu thành công
+    }
+
+    // ==========================================
+    // Hàm lấy TẤT CẢ phản ánh (Dành cho Admin)
+    // ==========================================
+    fun getAllReports(): List<Report> {
+        val list = mutableListOf<Report>()
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM Reports ORDER BY report_id DESC", null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val report = Report(
+                    reportId = cursor.getInt(cursor.getColumnIndexOrThrow("report_id")),
+                    userId = cursor.getInt(cursor.getColumnIndexOrThrow("user_id")),
+                    title = cursor.getString(cursor.getColumnIndexOrThrow("title")),
+                    content = cursor.getString(cursor.getColumnIndexOrThrow("content")),
+                    createdDate = cursor.getString(cursor.getColumnIndexOrThrow("created_date")),
+                    status = cursor.getString(cursor.getColumnIndexOrThrow("status"))
+                )
+                list.add(report)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return list
+    }
+    // ==========================================
+    // 1. Hàm XÓA cư dân khỏi phòng (AdminApartmentActivity dùng)
+    // ==========================================
+    fun removeUserFromRoom(roomId: String): Boolean {
+        val db = this.writableDatabase
+        return try {
+            // Bước A: Cập nhật trạng thái phòng về "Trống"
+            val aptValues = android.content.ContentValues()
+            aptValues.put("room_status", "Trống")
+            db.update("Apartments", aptValues, "room_id = ?", arrayOf(roomId))
+
+            // Bước B: Tìm User đang ở phòng này và xóa mã phòng của họ
+            val userValues = android.content.ContentValues()
+            userValues.put("user_roomID", "") // Để trống mã phòng
+            db.update("Users", userValues, "user_roomID = ?", arrayOf(roomId))
+
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    // ==========================================
+    // 2. Hàm GÁN cư dân vào phòng (AdminApartmentActivity dùng)
+    // ==========================================
+    fun assignUserToRoom(userId: Int, roomId: String): Boolean {
+        val db = this.writableDatabase
+        return try {
+            // Bước A: Cập nhật mã phòng cho User được chọn
+            val userValues = android.content.ContentValues()
+            userValues.put("user_roomID", roomId)
+            db.update("Users", userValues, "user_id = ?", arrayOf(userId.toString()))
+
+            // Bước B: Cập nhật trạng thái phòng thành "Đang ở"
+            val aptValues = android.content.ContentValues()
+            aptValues.put("room_status", "Đang ở")
+            db.update("Apartments", aptValues, "room_id = ?", arrayOf(roomId))
+
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+    // ==========================================
+    // Hàm CẬP NHẬT Thông báo (Dành cho Admin)
+    // ==========================================
+    fun updateNotification(id: Int, title: String, content: String, type: String): Boolean {
         val db = this.writableDatabase
         val values = android.content.ContentValues()
         values.put("title", title)
         values.put("content", content)
         values.put("type", type)
 
-        val result = db.update("Notifications", values, "notify_id = ?", arrayOf(notifyId.toString()))
+        val result = db.update("Notifications", values, "notify_id = ?", arrayOf(id.toString()))
         db.close()
         return result > 0
     }
 
-    // Admin xóa thông báo
-    fun deleteNotification(notifyId: Int): Boolean {
+    // ==========================================
+    // Hàm XÓA Thông báo (Dành cho Admin)
+    // ==========================================
+    fun deleteNotification(id: Int): Boolean {
         val db = this.writableDatabase
-        val result = db.delete("Notifications", "notify_id = ?", arrayOf(notifyId.toString()))
+        val result = db.delete("Notifications", "notify_id = ?", arrayOf(id.toString()))
         db.close()
         return result > 0
+    }
+    // ==========================================
+// Hàm kiểm tra xem phòng đã có cư dân ở chưa
+// ==========================================
+    fun isRoomOccupied(roomId: String): Boolean {
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT COUNT(*) FROM Users WHERE user_roomID = ?", arrayOf(roomId))
+        var count = 0
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0)
+        }
+        cursor.close()
+        return count > 0 // Trả về true nếu số lượng người ở > 0
     }
 }
