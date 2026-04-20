@@ -85,7 +85,8 @@ class AdminDashboardActivity : AppCompatActivity() {
         }
         val btnViewReports = findViewById<CardView>(R.id.btnViewReports)
         btnViewReports.setOnClickListener {
-            Toast.makeText(this, "Chức năng Xem Báo cáo đang phát triển", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, ReportActivity::class.java)
+            startActivity(intent)
         }
     }
 }
