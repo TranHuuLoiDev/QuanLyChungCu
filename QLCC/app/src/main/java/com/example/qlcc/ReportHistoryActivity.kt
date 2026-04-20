@@ -1,15 +1,17 @@
 package com.example.qlcc
 
-import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
+import android.view.LayoutInflater
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ReportHistoryActivity : AppCompatActivity() {
 
-    // Khai báo biến ở đây để có thể dùng chung cho cả hàm onCreate và onResume
     private lateinit var rvReports: RecyclerView
     private lateinit var dbHelper: DatabaseHelper
     private var currentUser: User? = null
@@ -18,43 +20,62 @@ class ReportHistoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_report_history)
 
-        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbarHistory)
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setNavigationOnClickListener { finish() }
-
+        dbHelper = DatabaseHelper(this)
         rvReports = findViewById(R.id.rvReports)
         rvReports.layoutManager = LinearLayoutManager(this)
-        dbHelper = DatabaseHelper(this)
 
-        // Lấy ID người dùng hiện tại
         @Suppress("DEPRECATION")
         currentUser = intent.getSerializableExtra("USER_INFO") as? User
 
-        // Xử lý sự kiện nút Tạo Mới
         val btnCreateNewReport = findViewById<Button>(R.id.btnCreateNewReport)
         btnCreateNewReport.setOnClickListener {
-            val intent = Intent(this, ReportActivity::class.java)
-
-            // ---> ĐÂY CHÍNH LÀ DÒNG BẠN THIẾU <---
-            // Phải gửi thông tin người dùng sang trang gửi thì nó mới cho lưu vào Database
-            intent.putExtra("USER_INFO", currentUser)
-
-            startActivity(intent)
+            showAddReportDialog()
         }
+
+        loadReports()
     }
 
-    // =========================================================
-    // HÀM MỚI: Tự động tải lại danh sách khi màn hình này hiện lên
-    // =========================================================
-    override fun onResume() {
-        super.onResume()
+    private fun showAddReportDialog() {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_report, null)
+        val edtTitle = dialogView.findViewById<EditText>(R.id.edtReportTitle)
+        val edtContent = dialogView.findViewById<EditText>(R.id.edtReportContent)
 
-        // Mỗi khi màn hình Lịch sử hiện lên (bao gồm cả lúc vừa gửi phản ánh xong và quay lại)
-        // Nó sẽ tự động chọc vào Database để lấy danh sách mới nhất
-        if (currentUser != null) {
-            val list = dbHelper.getReportsByUserId(currentUser!!.userId)
-            rvReports.adapter = ReportAdapter(list)
-        }
+        AlertDialog.Builder(this)
+            .setTitle("Gửi phản ánh mới")
+            .setView(dialogView)
+            .setPositiveButton("Gửi") { _, _ ->
+                val title = edtTitle.text.toString().trim()
+                val content = edtContent.text.toString().trim()
+
+                if (title.isNotEmpty() && content.isNotEmpty()) {
+                    val userId = currentUser?.userId ?: 1
+
+                    // 👉 THÊM NGÀY GIỜ (fix lỗi thiếu tham số)
+                    val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                    val currentDate = sdf.format(Date())
+
+                    // 👉 GỌI HÀM MỚI (Boolean)
+                    val success = dbHelper.insertReport(userId, title, content, currentDate)
+
+                    if (success) {
+                        Toast.makeText(this, "Gửi thành công!", Toast.LENGTH_SHORT).show()
+                        loadReports()
+                    } else {
+                        Toast.makeText(this, "Gửi thất bại!", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Toast.makeText(this, "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Hủy", null)
+            .show()
+    }
+
+    private fun loadReports() {
+        val userId = currentUser?.userId ?: 1
+        val list = dbHelper.getReportsByUserId(userId)
+
+        // 👉 Đảm bảo đúng kiểu MutableList cho Adapter
+        rvReports.adapter = ReportAdapter(list.toMutableList())
     }
 }
